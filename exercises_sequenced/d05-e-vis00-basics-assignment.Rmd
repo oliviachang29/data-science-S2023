@@ -30,10 +30,20 @@ knitr::opts_chunk$set(echo = TRUE)
 *Hint*: We learned how to inspect a dataset in `e-data-00-basics`!
 
 ```{r q1-task, eval=FALSE}
+
+?diamonds
 ```
+
+
+cut = quality of the cut, ranges from Fiar to Ideal
+color = diamond color, D = best, J = worst
+clarity = measurement of how clear the dataset is
 
 ### __q2__ Use your "standard checks" to determine what variables the dataset has.
 
+```{r}
+glimpse(diamonds)
+```
 
 Now that we have the list of variables in the dataset, we know what we can visualize!
 
@@ -46,12 +56,15 @@ y` pairs. Language is hard!
 
 ```{r q3-task}
 ## TODO: Complete this code
-ggplot(diamonds)
+ggplot(diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- In general, as carat increases, so does price
+- Price seems to increase exponentially with carat rather than linearly
+- price and carat seem more correlated for smaller carat diamonds than larger carat diamonds
 
 ## A note on *aesthetics*
 
@@ -69,12 +82,15 @@ simultaneously.
 
 ```{r q4-task}
 ## TODO: Complete this code
-ggplot(diamonds)
+ggplot(diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, color = cut))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- Ideal cut diamonds are more expensive than fair cut diamonds of the same carat. In general, better cut equals higher price.
+- In general, for ideal cut diamonds, price increases more quickly with carat than for fair cut diamonds
+- The outliers noticed in the previous graph with high carat but lower price than one might expect (i.e. outside the correlation) are of fair cut.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

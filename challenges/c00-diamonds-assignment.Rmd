@@ -1,7 +1,7 @@
 ---
 title: "Getting Started: Diamonds"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-1-23
 output:
   github_document:
     toc: true
@@ -54,24 +54,29 @@ In this first stage, you will explore the `diamonds` dataset and document your o
 
 ```{r q1-task}
 ## TASK: Plot `price` vs `carat` below
-## Your code here!
+ggplot(diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
+- In general, as carat increases, so does price.
+- However, it is not a clean trend line, as it appears that there are several outliers to this general correlation, where there are diamonds of larger carat but not correspondingly higher price.
+- Price and carat seem more strongly correlated for smaller carat diamonds than larger carat diamonds
 
 ### __q2__ Create a visualization showing variables `carat`, `price`, and `cut` simultaneously. Experiment with which variable you assign to which aesthetic (`x`, `y`, etc.) to find an effective visual.
 
 ```{r q2-task}
 ## TASK: Plot `price`, `carat`, and `cut` below
-## Your code here!
+ggplot(diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, color = cut))
 ```
 
 **Observations**:
 
-- (Write your observations here!)
-
+- Ideal cut diamonds are more generally expensive than fair cut diamonds of the same carat. In general, better cut equals higher price.
+- In general, for ideal cut diamonds, price increases more quickly with carat than for fair cut diamonds
+- The outliers noticed in the previous graph with high carat but lower price than one might expect (i.e. outside the correlation) are of fair cut.
 
 # Communication
 <!-- -------------------------------------------------- -->

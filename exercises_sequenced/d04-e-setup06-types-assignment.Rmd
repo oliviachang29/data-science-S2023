@@ -13,6 +13,8 @@ reading: 5
 
 *Reading*: [Types](https://rstudio.cloud/learn/primers/1.2)
 
+* c function creates your own vectors i.e. c(1 2 3)
+
 ```{r setup, include=FALSE}
 # knitr options
 knitr::opts_chunk$set(echo = TRUE)
@@ -25,6 +27,13 @@ library(tidyverse)
 
 ## Objects vs Strings
 <!-- -------------------------------------------------- -->
+
+Store results by creating object
+```{r}
+num <- "b"
+num
+```
+
 
 ### __q1__ Describe what is wrong with the code below.
 
@@ -39,7 +48,7 @@ airport == ATL
 
 **Observations**:
 
-- Write your explanation here
+ATL is an object, not a string, does not exist yet so can't compare whether the value of airport and ATL are the same
 
 ## Casting
 <!-- -------------------------------------------------- -->
@@ -55,7 +64,8 @@ Sometimes our data will not be in the form we want; in this case we may need to 
 
 ```{r q2-task}
 v_string <- c("00", "45", "90")
-v_integer <- NA_real_
+v_integer <- as.integer(v_string)
+v_integer
 ```
 
 Use the following test to check your work.
