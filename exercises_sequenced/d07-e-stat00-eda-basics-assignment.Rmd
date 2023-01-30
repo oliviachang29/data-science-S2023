@@ -44,6 +44,8 @@ library(tidyverse)
 to do? Do those simple checks on the diamonds dataset below.
 
 ```{r q0-task}
+glimpse(diamonds)
+summary(diamonds)
 ```
 
 I'm going to walk you through a train of thought I had when studying the
@@ -70,7 +72,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- Actually, Ideal cut diamonds are the most common cut of diamond in this dataset, although they do not outnumber the rest of the diamonds combined.
 
 ## Hypothesis 2
 
@@ -87,7 +89,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- It is very difficult to determine from this graph whether or not ideal cut diamonds are more expensive than the rest of the diamond cuts. Based on the graph, it looks like ideal cut diamonds are essentially the same price, but the graph may be misleading.
 
 The following is a set of *boxplots*; the middle bar denotes the median, the
 boxes denote the *quartiles* (upper and lower "quarters" of the data), and the
@@ -102,7 +104,7 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- The graph contradicts hypothesis 2 as the median and upper quartile price for ideal cut diamonds is clearly lower than both premium and very good diamonds in this dataset. However, there are  more outliers in the ideal dataset than very good and premium diamonds, which may indicate that ideal cut diamonds are not necessarily always less expensive.
 
 ## Unraveling Hypothesis 2
 
@@ -122,7 +124,10 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- According to the wikipedia article, "The price per carat does not increase linearly with increasing size. Instead, there are sharp jumps around milestone carat weights, as demand is much higher for diamonds weighing just more than a milestone than for those weighing just less. As an example, a 0.99-carat diamond may have a significantly lower price per carat than a comparable 1.01-carat diamond, because of differences in demand."
+Additionally, "Today, because of the relative importance of carat weight among buyers, many diamonds are often intentionally cut poorly to increase carat weight. There is a financial premium for a diamond that weighs the desirable 1.0 carat (200 mg), so often the girdle is made thicker or the depth is increased."
+Therefore, there is an incentive to increase carat of the diamond by sacrificing the quality of the cut.
+- It seems like lower quality cut diamonds tend to have a higher carat based on the graph, as the median carat for fair quality cuts is approximately 1 carat and is higher than the median for the rest of the cuts. This supports the statement in the Wikipedia article that jewelers prioritize making lower quality cuts to attain higher carat diamonds, particularly diamonds that are 1 milestone, in order to sell it for a higher price.
 
 ## Footnotes
 

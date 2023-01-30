@@ -1,7 +1,7 @@
 ---
 title: "RMS Titanic"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-1-30
 output:
   github_document:
     toc: true
@@ -51,11 +51,13 @@ df_titanic <- as_tibble(Titanic)
 
 ```{r q1-task}
 ## TASK: Perform a `glimpse` of df_titanic
+df_titanic %>% glimpse()
+df_titanic
 ```
 
 **Observations**:
 
-- (List all variables here)
+- The variables in `df_titanic` are `Class`, `Sex`, `Age`, `Survived`, and `n`. 
 
 ### __q2__ Skim the [Wikipedia article](https://en.wikipedia.org/wiki/RMS_Titanic) on the RMS Titanic, and look for a total count of souls aboard. Compare against the total computed below. Are there any differences? Are those differences large or small? What might account for those differences?
 
@@ -67,27 +69,30 @@ df_titanic %>% summarize(total = sum(n))
 
 **Observations**:
 
-- Write your observations here
-- Are there any differences?
-  - (Your response here)
-- If yes, what might account for those differences?
-  - (Your response here)
-  - ...
+According to the [Wikipedia article](https://en.wikipedia.org/wiki/RMS_Titanic, there were an estimated 2,224 passengers and crew aboard the Titanic. The `df_titanic` data set has 2201 people in the set, which is a difference of 23 passengers. According to the article, the exact passenger list is not clear because some people are double counted as they traveled under aliases, and the list also included some names of people who cancelled their trip at the last minute. This may account for the discrepancy in the article and the dataframe.
 
 ### __q3__ Create a plot showing the count of persons who *did* survive, along with aesthetics for `Class` and `Sex`. Document your observations below.
 
 *Note*: There are many ways to do this.
 
 ```{r q3-task}
+df_titanic %>%
+  filter(Survived == "Yes") %>%
+   ggplot() + 
+    geom_col(mapping = aes(x = Class, y = n, fill = Sex), position = "dodge")
+
 ## TASK: Visualize counts against `Class` and `Sex`
 ```
 
 **Observations**:
 
-- Write your observations here
+- In 1st and 2nd class, the raw count of female passengers that survived is greater than the raw count of male passengers that survived.
+- In the 3rd class, approximately the same number of female and male passengers survived.
+- In the Crew class, more male passengers survived than female passengers.
+- The raw count of 1st class passengers that survived is greater than that of 2nd class passengers and 3rd class passengers.
 
 # Deeper Look
-<!-- -------------------------------------------------- -->
+<!-- ------------------------------------`-------------- -->
 
 Raw counts give us a sense of totals, but they are not as useful for understanding differences between groups. This is because the differences we see in counts could be due to either the relative size of the group OR differences in outcomes for those groups. To make comparisons between groups, we should also consider *proportions*.[1]
 
@@ -110,26 +115,41 @@ df_prop
 ### __q4__ Replicate your visual from q3, but display `Prop` in place of `n`. Document your observations, and note any new/different observations you make in comparison with q3. Is there anything *fishy* in your plot?
 
 ```{r q4-task}
+df_prop %>%
+  filter(Survived == "Yes") %>%
+   ggplot() + 
+    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")
 ```
 
 **Observations**:
 
-- Write your observations here.
+- According to the graph, 100% of 1st and 2nd class passengers survived, regardless of their sex.
+- In 3rd class and Crew, the proportion of female passengers that survived is greater than the proportion of male passengers that survived. In the first plot, the raw count of female and male passengers in 3rd class that survived was approximately the same.
+- In Crew, the proportion of female passengers that survived (~0.87) is much greater than the proportion of male passengers that survived (~0.23). This is in comparison to the first plot, where the raw count of male passengers in Crew that survived is much greater than the raw count of female passengers that survived.
 - Is there anything *fishy* going on in your plot?
-  - (Your response here)
+  - Yes. According to the plot, everyone in first class and second class survived, but from the `df_prop` tibble we can see that there are plenty of first class and second passengers that did not survive. For example, there are 118 1st-class male adults that did not survive.
 
 ### __q5__ Create a plot showing the group-proportion of occupants who *did* survive, along with aesthetics for `Class`, `Sex`, *and* `Age`. Document your observations below.
 
 *Hint*: Don't forget that you can use `facet_grid` to help consider additional variables!
 
 ```{r q5-task}
+df_prop %>%
+  filter(Survived == "Yes") %>%
+   ggplot() + 
+    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge") +
+    facet_grid(~ Age)
+    
 ```
 
 **Observations**:
 
-- (Write your observations here.)
+- The proportion of adults that survived is less than the proportion of children that survived, for both female and male passengers in 1st and 2nd class.
+- All of the children in the first and second class survived.
+- There were no children in crew.
+- The proportion of children that survived was much lower in 3rd class than 1st and 2nd class.
 - If you saw something *fishy* in q4 above, use your new plot to explain the fishy-ness.
-  - (Your response here)
+  - In q4, it appeared that everyone in first and second class survived, even though that was not the case. This was because the q4 graph was overlaying the proportion of children that survived over the proportion of adults that survived, and the children-survival proportion (100%) was masking the adult-survival proportion for first and second class. Once the graphs were separated by age, we can see that the adult proportion of 1st and 2nd class that survived was less than 100%.
 
 # Notes
 <!-- -------------------------------------------------- -->

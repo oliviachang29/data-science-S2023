@@ -93,8 +93,8 @@ Here the bolded response is *actively* engaging with your colleague's question, 
 
 **Observations**:
 
-- Is the bolded response **active** or **passive**? Why?
-- Is the bolded response **constructive** or **destructive**? Why?
+- Is the bolded response **active** or **passive**? Why? The bolded response is active because it acknowledges the colleague's concern about the axes being unlabeled.
+- Is the bolded response **constructive** or **destructive**? Why? The bolded response is constructive as it conveys positive emotion.
 - How does this statement make you *feel*, relative to the bolded statement before the q1 prompt?
 
 ### __q2__ Identify the nature of the bolded line below, rating it as either **active vs passive** and **constructive vs destructive**.
@@ -107,9 +107,9 @@ Here the bolded response is *actively* engaging with your colleague's question, 
 
 **Observations**:
 
-- Is the bolded response **active** or **passive**? Why?
-- Is the bolded response **constructive** or **destructive**? Why?
-- How does this statement make you *feel*, relative to the bolded statement before the q1 prompt?
+- Is the bolded response **active** or **passive**? Why? The bolded responsive is passive, as it does not address the substance of the question (what are the axes?).
+- Is the bolded response **constructive** or **destructive**? Why? The bolded responsive is constructive, as it conveys positive emotion (as opposed to offense).
+- How does this statement make you *feel*, relative to the bolded statement before the q1 prompt? It feels less negative/destructive than the bolded statement before the q1 prompt, but I would feel irritated that the substance of my question wasn't being addressed (i.e. they aren't really paying attention).
 
 **Intermediate Conclusion**: We can quite naturally think of discussion responses in the APCD framework. Therefore, we should try to give active and constructive responses in data discussions!
 
@@ -174,8 +174,8 @@ Let's practice once more!
 
 **Observations**:
 
-- Is the bolded response **active** or **passive**? Why?
-- Is the bolded response **constructive** or **destructive**? Why?
+- Is the bolded response **active** or **passive**? Why? The bolded response is passive, as it does not engage with the substantive content of the graph and instead asks an unrelated question.
+- Is the bolded response **constructive** or **destructive**? Why? The bolded response is neither particularly constructive nor destructive; on one hand the colleague demonstrates that they care about the presenter's opinion on the morality of aesthetic diamonds. On the other hand the colleague is demonstrating a disregard for the substance of the graph.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

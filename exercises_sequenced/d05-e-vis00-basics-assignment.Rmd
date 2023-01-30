@@ -62,9 +62,9 @@ ggplot(diamonds) +
 
 **Observations**:
 
-- In general, as carat increases, so does price
+- In general, as carat increases, so does price. However, it is not a clean trend line, as it appears that there are several outliers to this general correlation, where there are diamonds of larger carat but not correspondingly higher price.
 - Price seems to increase exponentially with carat rather than linearly
-- price and carat seem more correlated for smaller carat diamonds than larger carat diamonds
+- Price and carat seem more correlated for smaller carat diamonds than larger carat diamonds
 
 ## A note on *aesthetics*
 
@@ -88,7 +88,7 @@ ggplot(diamonds) +
 
 **Observations**:
 
-- Ideal cut diamonds are more expensive than fair cut diamonds of the same carat. In general, better cut equals higher price.
+- Ideal cut diamonds are more generally expensive than fair cut diamonds of the same carat. In general, better cut equals higher price.
 - In general, for ideal cut diamonds, price increases more quickly with carat than for fair cut diamonds
 - The outliers noticed in the previous graph with high carat but lower price than one might expect (i.e. outside the correlation) are of fair cut.
 
