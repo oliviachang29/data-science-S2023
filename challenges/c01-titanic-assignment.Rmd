@@ -88,7 +88,7 @@ df_titanic %>%
 
 - In 1st and 2nd class, the raw count of female passengers that survived is greater than the raw count of male passengers that survived.
 - In the 3rd class, approximately the same number of female and male passengers survived.
-- In the Crew class, more male passengers survived than female passengers.
+- In the Crew class, more male crew members survived than female crew members.
 - The raw count of 1st class passengers that survived is greater than that of 2nd class passengers and 3rd class passengers.
 
 # Deeper Look
@@ -124,10 +124,9 @@ df_prop %>%
 **Observations**:
 
 - According to the graph, 100% of 1st and 2nd class passengers survived, regardless of their sex.
-- In 3rd class and Crew, the proportion of female passengers that survived is greater than the proportion of male passengers that survived. In the first plot, the raw count of female and male passengers in 3rd class that survived was approximately the same.
-- In Crew, the proportion of female passengers that survived (~0.87) is much greater than the proportion of male passengers that survived (~0.23). This is in comparison to the first plot, where the raw count of male passengers in Crew that survived is much greater than the raw count of female passengers that survived.
-- Is there anything *fishy* going on in your plot?
-  - Yes. According to the plot, everyone in first class and second class survived, but from the `df_prop` tibble we can see that there are plenty of first class and second passengers that did not survive. For example, there are 118 1st-class male adults that did not survive.
+- In 3rd class and Crew, the proportion of female people that survived is greater than the proportion of male people that survived. In the first plot, the raw count of female and male passengers in 3rd class that survived was approximately the same.
+- In Crew, the proportion of female crew members that survived (~0.87) is much greater than the proportion of male crew members that survived (~0.23). This is in comparison to the first plot, where the raw count of male members in Crew that survived is much greater than the raw count of female members that survived.
+- According to the plot, everyone in first class and second class survived, but from the `df_prop` tibble we can see that there are plenty of first class and second passengers that did not survive. For example, there are 118 1st-class male adults that did not survive.
 
 ### __q5__ Create a plot showing the group-proportion of occupants who *did* survive, along with aesthetics for `Class`, `Sex`, *and* `Age`. Document your observations below.
 
@@ -148,8 +147,7 @@ df_prop %>%
 - All of the children in the first and second class survived.
 - There were no children in crew.
 - The proportion of children that survived was much lower in 3rd class than 1st and 2nd class.
-- If you saw something *fishy* in q4 above, use your new plot to explain the fishy-ness.
-  - In q4, it appeared that everyone in first and second class survived, even though that was not the case. This was because the q4 graph was overlaying the proportion of children that survived over the proportion of adults that survived, and the children-survival proportion (100%) was masking the adult-survival proportion for first and second class. Once the graphs were separated by age, we can see that the adult proportion of 1st and 2nd class that survived was less than 100%.
+- In q4, it appeared that everyone in first and second class survived, even though that was not the case. This was because the q4 graph was overlaying the proportion of children that survived over the proportion of adults that survived, and the children-survival proportion (100%) was masking the adult-survival proportion for first and second class. Once the graphs were separated by age, we can see that the adult proportion of 1st and 2nd class that survived was less than 100%.
 
 # Notes
 <!-- -------------------------------------------------- -->
