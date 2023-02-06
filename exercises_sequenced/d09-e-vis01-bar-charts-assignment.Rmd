@@ -31,10 +31,19 @@ library(tidyverse)
 `geom_col()`. Use that knowledge to convert the following `geom_bar()` plot into
 the same visual using `geom_col()`.
 
-```{r q1-task}
+```{r}
 mpg %>%
   ggplot(aes(trans)) +
   geom_bar()
+```
+
+
+```{r q1-task}
+
+mpg %>%
+  count(trans) %>%
+  ggplot() +
+    geom_col(mapping = aes(x = trans, y = n))
 ```
 
 The reading mentioned that when using `geom_col()` our x-y data should be
@@ -57,11 +66,11 @@ mpg %>% filter(cty == 20)
 ```{r q2-task}
 mpg %>%
   ggplot(aes(x = cty, y = hwy)) +
-  geom_col()
+  geom_col(position = "dodge")
 ```
 
 **Observations**:
-- Write your observations here!
+- In the prior graph (without changes), it seems like it is adding together all of the values of `hwy` for the given value of `cty`, which is not an accurate representation of the data.
 
 A more standard way to visualize this kind of data is a *scatterplot*, which
 we'll study later. For now, here's an example of a more effective way to
@@ -87,7 +96,7 @@ mpg %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- The v1 visualization displays the number of instances of each class and varies the color by the class. Color is mostly aesthetic and does not add any additional information to the graph.
 
 ```{r q4-v2}
 ## TODO: Run this code without changing, describe your observations on the data
@@ -97,12 +106,16 @@ mpg %>%
 ```
 
 **Observations**:
-- Write your observations here!
+- The v2 visualization displays the count of each class and varies the color by the type of drive (`drv` variable). Color thus demonstrates the count, within each class, depending on `drv`.
 
 **Compare `v1` and `v2`**:
 
 - Which visualization---`v1` or `v2`---enabled you to make more observations?
+
+v2 allows us to make more observations because the added color allows you to deduce the count based on `drv` *within* each class,
+
 - What was the difference between `v1` and `v2`?
+In v1, the fill is redundant because each bar is already being separated by color. v2, the fill is not redundant because the color indicates the `drv` value.
 
 ### __q4__ The following code has a bug; it does not do what its author intended.
 Identify and fix the bug. What does the resulting graph tell you about the
@@ -113,13 +126,15 @@ do this in a future exercise.
 
 ```{r q4-task}
 mpg %>%
-  ggplot(aes(x = manufacturer, fill = class), position = "dodge") +
-  geom_bar() +
+  ggplot(aes(x = manufacturer, fill = class)) +
+  geom_bar(position = "dodge") +
   theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 0))
 ```
 
 **Observations**
-- Your observations here!
+- audi has a lot of compact cars.
+- jeep, land rover, lincoln, and mercury only sell SUVs according to this dataset.
+- 
 
 ### __q5__ The following graph is hard to read. What other form of faceting would
 make the visual more convenient to read? Modify the code below with your
@@ -129,7 +144,7 @@ suggested improvement.
 mpg %>%
   ggplot(aes(x = cyl)) +
   geom_bar() +
-  facet_grid(~ manufacturer)
+  facet_wrap(~ manufacturer)
 ```
 
 <!-- include-exit-ticket -->

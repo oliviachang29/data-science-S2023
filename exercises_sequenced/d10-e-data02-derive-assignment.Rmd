@@ -34,6 +34,8 @@ library(tidyverse)
 
 ### __q1__ What is the difference between these two versions? How are they the same? How are they different?
 
+version one accepts a dataframe as its first argument for `filter`. version two uses a pipe so that the diamonds dataframe is piped into `filter`.
+
 ```{r q1-task}
 ## Version 1
 filter(diamonds, cut == "Ideal")
@@ -58,7 +60,11 @@ in the table below:
 ### __q2__ Using `summarize()` and a logical summary function, determine the number of rows with `Ideal` `cut`. Save this value to a column called `n_ideal`.
 
 ```{r q2-task}
-df_q2
+df_q2 <- diamonds %>%
+  filter(cut == "Ideal") %>%
+  summarize(n_ideal = n())
+  
+
 ```
 
 The following test will verify that your `df_q2` is correct:
@@ -76,9 +82,11 @@ print("Great job!")
 
 ### __q3__ The function `group_by()` modifies how other dplyr verbs function. Uncomment the `group_by()` below, and describe how the result changes.
 
+When you uncomment `group_by`, the result changes from a price summary of the entire dataframe to a price summary of subsets of the dataframe, grouped by color and clarity.
+
 ```{r q3-task}
 diamonds %>%
-  ## group_by(color, clarity) %>%
+  group_by(color, clarity) %>%
   summarize(price = mean(price))
 ```
 
@@ -111,14 +119,22 @@ tibble to `df_q4`, and assign the appropriate values to `cov_depth` and
 ```{r q4-task}
 ## TODO: Compute the `cov_depth` and `cov_diff` and assign the result to df_q4
 df_q4 <-
-  diamonds
+  diamonds %>%
+    mutate(depth_computed = 100 * 2 * z / (x+y), diff = depth - depth_computed) %>%
+    summarise(depth_mean = mean(depth, na.rm = TRUE),
+              depth_sd = sd(depth, na.rm = TRUE),
+              cov_depth = depth_sd / depth_mean,
+              
+              diff_mean = mean(diff, na.rm = TRUE),
+              diff_sd = sd(diff, na.rm = TRUE),
+              cov_diff =  diff_sd / diff_mean)
 df_q4
 ```
 
 **Observations**
 
-- Comment on the relative values of `cov_depth` and `cov_diff`.
-- Why is `cov_diff` so large?
+- `cov_depth` is approximately 0.023 (unitless) while `cov_diff` is 498 (unitless), `cov_diff` is many orders of magnitude greater than `cov_depth`. 
+- Why is `cov_diff` so large? This shows that there is a big variation in the diamonds dataset in the differences between actual depth and calculated depth. Some of the diamonds have a stated depth that is quite close to the calculated depth, while other diamonds have a stated depth that is very different from the calculated depth.
 
 The following test will verify that your `df_q4` is correct:
 
@@ -142,6 +158,11 @@ about the various cuts? Do those observations match your expectations?
 
 ```{r q5-task}
 ## TODO: Assign result to df_q5
+df_q5 <-
+  diamonds %>%
+    group_by(cut) %>%
+    summarise(price_mean = mean(price, na.rm = TRUE), price_sd = sd(price, na.rm = TRUE), price_cov = price_sd/price_mean)
+
 df_q5
 ```
 
@@ -166,7 +187,7 @@ print("Excellent!")
 
 **Observations**:
 
-- Write your observations here!
+- There is the greatest amount of variance in price for ideal, variance increases from least to most ideal cut.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

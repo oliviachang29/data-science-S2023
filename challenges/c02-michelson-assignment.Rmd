@@ -1,7 +1,7 @@
 ---
 title: "Michelson Speed-of-light Measurements"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-05-02
 output:
   github_document:
     toc: true
@@ -83,18 +83,21 @@ df_michelson %>% glimpse
 |            1 | 15 |   299810 |
 
 ```{r q1-task}
-## TODO: Compute summaries
-df_q1 <- NA
+## Compute summaries
+df_q1 <- df_michelson %>%
+  group_by(Distinctness) %>%
+  summarise(n = n(), MeanVelocity = mean(Velocity))
 df_q1 %>%
   arrange(desc(Distinctness)) %>%
   knitr::kable()
 ```
 
 **Observations**:
-- Write your observations here!
-  - (Your response here)
-- Why might your table differ from Michelson's?
-  - (Your response here)
+
+- There are 46 measurements of "good" distinctness, 39 measurements of "fair" distinctness, and 15 measures of "poor" distinctness.
+- The velocity is highest for measurements where the image distinctness is "good", and lowest for measurements where the image distinctness is "poor". The difference in velocity is approximately 60 km/s.
+- The velocity values in the re-created table are approximately 1-2 km/s off the original table. 
+-  It's possible that Michelson only had five  significant figures and had to round his data to the nearest tens, which could account for the difference in my table and the original table.
 
 The `Velocity` values in the dataset are the speed of light *in air*; Michelson
 introduced a couple of adjustments to estimate the speed of light in a vacuum.
@@ -106,8 +109,9 @@ observations in the dataset.
 ### __q2__ Create a new variable `VelocityVacuum` with the $+92$ km/s adjustment to `Velocity`. Assign this new dataframe to `df_q2`.
 
 ```{r q2-task}
-## TODO: Adjust the data, assign to df_q2
-df_q2 <- NA
+## Adjust the data, assign to df_q2
+df_q2 <- df_michelson %>%
+  mutate(VelocityVacuum = Velocity + 92)
 
 df_q2
 ```
@@ -134,15 +138,16 @@ problems uncertainty includes some amount of human judgment.[2]
 ### __q3__ Compare Michelson's speed of light estimate against the modern speed of light value. Is Michelson's estimate of the error (his uncertainty) greater or less than the true error?
 
 ```{r q3-task}
-## TODO: Compare Michelson's estimate and error against the true value
-## Your code here!
+## Compare Michelson's estimate and error against the true value
+LIGHTSPEED_PM # Michelson's estimate of the error, a.k.a. uncertainty
+abs(LIGHTSPEED_VACUUM - LIGHTSPEED_MICHELSON) # True error
+
 ```
 
 **Observations**:
-- Is Michelson's estimate of the error (his uncertainty) greater or less than the true error?
-  - (Your response here)
-- Make a quantitative comparison between Michelson's uncertainty and his error.
-  - (Your response here)
+
+- Michelson's estimate of the error is lower than the true error.
+- Michelson's estimate of the error is 51 km/s, which is approximately one-third of the actual error, which is 151.542 km/s.
 
 The following plot shows all of Michelson's data as a [control chart](https://en.wikipedia.org/wiki/Control_chart); this sort of plot is common in manufacturing, where it is used to help determine if a manufacturing process is under [statistical control](https://en.wikipedia.org/wiki/Statistical_process_control). Each dot is one of Michelson's measurements, and the grey line connects the mean taken for each day. The same plot also shows simulated data using a probability model. We'll get into statistics later in the course; for now, let's focus on understanding what real and simulated data tend to look like.
 
@@ -206,18 +211,39 @@ df_q2 %>%
 ```
 
 **Observations**:
+
 Similarities
-- (your responses here)
+
+- Both graphs have several measurements that are outside the control limits.
+- Both graphs demonstrate fluctuation around the control line over time.
+
 Differences
-- (your responses here)
+
+- The "mean" line in the real graph jumps outside of the control limits approximately four times, compared to the simulated graph where the "mean" line only jumps outside of the control limits twice.
+- Qualitatively, the "mean" line seems to fluctuate slightly less in the simulated data than in the real data.
+- In the real graph, the velocity in vacuum measurements that are outside of the control limits were taken towards the beginning, whereas the velocity in vacuum measurements that are outside of the control limits in the simulated graph were taken towards the end.
 
 ### __q5__ You have access to a few other variables. Construct a few visualizations of `VelocityVacuum` against these other factors. Are there other patterns in the data that might help explain the difference between Michelson's estimate and `LIGHTSPEED_VACUUM`?
 
+```{r}
+
+ggplot(df_q2) +
+  geom_point(mapping = aes(x = VelocityVacuum, y = Temp))
+
+ggplot(df_q2) +
+  geom_point(mapping = aes(x = VelocityVacuum, y = Distinctness))
+
+ggplot(df_q2) +
+  geom_point(mapping = aes(x = VelocityVacuum, y = Distinctness, color = Temp))
+
+
+```
+
+
 **Observations**:
 
-- Make sure to record observations on your graphs!
-
-
+- Looking at the graph of `VelocityVacuum` vs. `Temp`, there is a generally positive association between higher temperature and higher `VelocityVacuum` calculation. However, there are many outliers, and it visually does not appear to be a strong correlation. One could conclude that measurements taken at higher temperature result in a larger difference between Michelson's estimate and `LIGHTSPEED_VACUUM`.
+- In general, it appears that higher distinctiveness images result in a higher `VelocityVacuum` value.
 
 ## Bibliography
 
