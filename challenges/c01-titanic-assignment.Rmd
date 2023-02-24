@@ -78,8 +78,8 @@ According to the [Wikipedia article](https://en.wikipedia.org/wiki/RMS_Titanic, 
 ```{r q3-task}
 df_titanic %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = n, fill = Sex), position = "dodge")
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = n, fill = Sex), position = "dodge")
 
 ## TASK: Visualize counts against `Class` and `Sex`
 ```

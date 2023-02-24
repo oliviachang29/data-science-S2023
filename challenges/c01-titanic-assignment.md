@@ -87,10 +87,10 @@ library(tidyverse)
 ```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✔ ggplot2 3.4.0      ✔ purrr   1.0.1 
-    ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
-    ## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+    ## ✔ ggplot2 3.4.1     ✔ purrr   1.0.1
+    ## ✔ tibble  3.1.8     ✔ dplyr   1.1.0
+    ## ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+    ## ✔ readr   2.1.4     ✔ forcats 1.0.0
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -245,8 +245,8 @@ df_prop
 ``` r
 df_prop %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")
 ```
 
     ## Warning: Removed 2 rows containing missing values (`geom_col()`).
@@ -279,9 +279,9 @@ additional variables!
 ``` r
 df_prop %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge") +
-    facet_grid(~ Age)
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge") +
+  facet_grid(~ Age)
 ```
 
     ## Warning: Removed 2 rows containing missing values (`geom_col()`).
