@@ -117,8 +117,8 @@ df_prop
 ```{r q4-task}
 df_prop %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")
 ```
 
 **Observations**:
@@ -135,9 +135,9 @@ df_prop %>%
 ```{r q5-task}
 df_prop %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge") +
-    facet_grid(~ Age)
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge") +
+  facet_grid(~ Age)
     
 ```
 
