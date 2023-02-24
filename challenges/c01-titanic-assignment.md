@@ -177,8 +177,8 @@ the article and the dataframe.
 ``` r
 df_titanic %>%
   filter(Survived == "Yes") %>%
-   ggplot() + 
-    geom_col(mapping = aes(x = Class, y = n, fill = Sex), position = "dodge")
+  ggplot() + 
+  geom_col(mapping = aes(x = Class, y = n, fill = Sex), position = "dodge")
 ```
 
 ![](c01-titanic-assignment_files/figure-gfm/q3-task-1.png)<!-- -->
