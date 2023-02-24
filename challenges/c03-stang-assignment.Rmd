@@ -163,6 +163,26 @@ df_stang_long %>%
 - Does this graph support or contradict the claim above?
   - The graph suggests that the less thick aluminum blocks have a higher elastic modulus. This contradicts the claim above that elastic modulus is an intensive property - if it were intensive, the thickness should not affect the elastic modulus values. However, this evidence is not conclusive as we cannot be sure that it is the different thickness that affects the young's modulus value. 
 
+
+```{r q3-task}
+## TASK: Investigate your question from q1 here
+df_stang_long %>%
+  ggplot() + 
+    geom_density(mapping = aes(x = nu))
+```
+```{r q3-task}
+## TASK: Investigate your question from q1 here
+df_stang_long %>%
+  group_by(thick) %>%
+  summarize(mean_e_thick = mean(E))
+
+df_stang_long %>%
+  ggplot() +
+    geom_count(mapping = aes(x = thick, y = E)) +
+    geom_smooth(mapping = aes(x = thick, y = E)) +
+    df_stang_long 
+```
+
 # References
 <!-- -------------------------------------------------- -->
 

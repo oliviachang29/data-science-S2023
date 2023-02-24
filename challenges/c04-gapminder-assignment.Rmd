@@ -1,7 +1,7 @@
 ---
 title: "Gapminder"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-2-22
 output:
   github_document:
     toc: true
@@ -56,11 +56,17 @@ dataset?
 
 ```{r q0-task}
 ## TASK: Do your "first checks" here!
+
+glimpse(gapminder)
+
+summary(gapminder)
+
 ```
 
 **Observations**:
 
-- Write all variable names here
+- Variables in gapminder: country, continent, year, lifeExp, pop, gdpPercap
+- For each country, there is gdpPercap, pop, and lifeExp data for each year from 1952 to 2007.
 
 ### __q1__ Determine the most and least recent years in the `gapminder` dataset.
 
@@ -68,8 +74,12 @@ dataset?
 
 ```{r q1-task}
 ## TASK: Find the largest and smallest values of `year` in `gapminder`
-year_max <- NA_real_
-year_min <- NA_real_
+year_max <- gapminder %>%
+  pull(year) %>%
+  max()
+year_min <- gapminder %>%
+  pull(year) %>%
+  min()
 ```
 
 Use the following test to check your work.
@@ -95,30 +105,57 @@ You may encounter difficulties in visualizing these data; if so document your ch
 
 ```{r q2-task}
 ## TASK: Create a visual of gdpPercap vs continent
+gapminder %>%
+  filter(year == year_min & gdpPercap < 60000) %>%
+  ggplot() +
+    geom_boxplot(mapping = aes(x = continent, y = gdpPercap))
 ```
+Note: for visual clarity, this graph is missing Kuwait, which had a gdpPercap of 108382.353 in 1952.
 
 **Observations**:
 
-- Write your observations here
+- In 1952, European countries had a higher median gdp per capita than Africa, Asia, and the Americas.
+- There is a large outlier in gdp per capita in Asian countries.  
+- The distribution of gdp per capita is skewed right for each country.
 
 **Difficulties & Approaches**:
 
-- Write your challenges and your approach to solving them
+- The large outlier in the Asian countries category makes it difficult to make out the rest of the data, since the rest of the data gets "squished".
+- I tried a violin plot on top of a box plot, so that it's easier to see the distribution in each continent, but also allows you to easily identify the outliers. According to R Graph, it is relatively common to introduce a violin plot to see both the distribution of the data and its summary statistics. However, I still didn't like how difficult it was to distinguish between different observations.
+- Finally, I filtered out countries with a gdpPercap > 60,000, which eliminated one outlier country (Kuwait). Even though the graph is then missing one data point, it made it much easier to visually distinguish between the Q1 line, median line, and Q3 lines for each continent, which I thought was a worthwhile tradeoff.
+
+
 
 ### __q3__ You should have found *at least* three outliers in q2 (but possibly many more!). Identify those outliers (figure out which countries they are).
 
 ```{r q3-task}
-## TASK: Identify the outliers from q2
+outliers <- gapminder %>% 
+  filter(year == year_min) %>%
+  group_by(continent) %>% 
+  mutate(
+    gdpPercap_iqr = IQR(gdpPercap),
+    gdpPercap_25 = quantile(gdpPercap, probs=0.25, na.rm=TRUE),
+    gdpPercap_75 = quantile(gdpPercap, probs=0.75, na.rm=TRUE)
+  ) %>%
+  mutate(
+    gdpPercap_outlier_bound_low = gdpPercap_25 - gdpPercap_iqr * 1.5,
+    gdpPercap_outlier_bound_high = gdpPercap_iqr * 1.5 + gdpPercap_75
+  ) %>%
+  filter(gdpPercap > gdpPercap_outlier_bound_high | gdpPercap < gdpPercap_outlier_bound_low)
+
+outliers
 ```
 
 **Observations**:
 
-- Identify the outlier countries from q2
-  - (Your response here)
+- The countries that are outliers on gdpPercap in the year 1952 are Angola, Bahrain, Canada, Gabon, Kuwait, South Africa, Switzerland, United States, and Venezuela.
+
 
 *Hint*: For the next task, it's helpful to know a ggplot trick we'll learn in an upcoming exercise: You can use the `data` argument inside any `geom_*` to modify the data that will be plotted *by that geom only*. For instance, you can use this trick to filter a set of points to label:
 
 ```{r layer-filter}
+
+
 ## NOTE: No need to edit, use ideas from this in q4 below
 gapminder %>%
   filter(year == max(year)) %>%
@@ -126,7 +163,7 @@ gapminder %>%
   ggplot(aes(continent, lifeExp)) +
   geom_boxplot() +
   geom_point(
-    data = . %>% filter(country %in% c("United Kingdom", "Japan", "Zambia")),
+    data = . %>%  filter(country %in% c("United Kingdom", "Japan", "Zambia")),
     mapping = aes(color = country),
     size = 2
   )
@@ -138,11 +175,24 @@ gapminder %>%
 
 ```{r q4-task}
 ## TASK: Create a visual of gdpPercap vs continent
+gapminder %>%
+  filter(gdpPercap < 60000 & year == year_min | year == year_max) %>%
+  ggplot(mapping = aes(x = continent, y = gdpPercap)) +
+    geom_boxplot() +
+    geom_point(
+      data = . %>%  filter(country %in% c(outliers %>% pull(country))),
+      mapping = aes(color = country),
+      size = 2
+    ) +
+    facet_wrap( .~ year)
 ```
 
 **Observations**:
 
-- Write your observations here
+- Many of the outlier countries in 1952 are still outliers in 2007, including Gabon, Canada, and the United States. On the other hand, Bahrain, South Africa, and Venezuela are no longer outliers in 2007 with their gdpPercap.
+- The distribution of gdpPercap in has widened for every continent, but particularly in both Asia and Europe, from 1952 to 2007.
+- The 75th percentile gdpPercap in Asia has increased a lot from 1952 to 2007, and is now greater than the 75th percentile gdpPercap in the Americas.
+- The median gdpPercap in Eruope and Oceania has increased quite a bit from 1952 to 2007.
 
 # Your Own EDA
 <!-- -------------------------------------------------- -->
@@ -152,19 +202,35 @@ Now it's your turn! We just went through guided EDA considering the GDP per capi
 ### __q5__ Create *at least* three new figures below. With each figure, try to pose new questions about the data.
 
 ```{r q5-task1}
-## TASK: Your first graph
+gapminder %>%
+  filter(country == "Burundi" | country == "Rwanda" | country == "Congo, Dem. Rep.") %>%
+  ggplot(mapping = aes(x = year, y = lifeExp)) +
+    geom_line(mapping = aes(color = country))
 ```
 
-- (Your notes and observations here)
+- This graph displays life expectancy vs. year for three African countries that were once Belgian colonies: Burundi, the DRC, and Rwanda. 
+- Life expectancy is generally increasing over time, but all three countries have a dip in life expectancy in the 1990s. What is the reason for each dip in life expectancy, and why do all three dips happen in the same decade?
+- In particular, Rwanda shows a sharp dip to a life expectancy below 25 years around approximately 1992, which may be due to the Rwandan genocide.
+- For each country, is life expectancy increasing at a greater rate in the 2000s compared to the 1950s?
 
 ```{r q5-task2}
-## TASK: Your second graph
+gapminder %>%
+  filter(country == "Uganda" | country == "Singapore" | country == "Malaysia") %>%
+  ggplot(mapping = aes(x = year, y = gdpPercap)) +
+    geom_line(mapping = aes(color = country))
 ```
 
-- (Your notes and observations here)
+- This graph displays gdp per capita over time for three former British colonies: Malaysia, Singapore, and Uganda.
+- Singapore's gdp per capita has increased at a much faster rate than Malaysia and Uganda. Relative to Malaysia and Singapore, Uganda's gdp per capita has remained relatively flat over time.
+- The rate of growth for gdp per capita flattens slightly for Singapore around 1997 and flattens out for Malaysia that same year. What could be the cause of that flattening? Do all Southeast Asian countries show that flattening?
 
 ```{r q5-task3}
-## TASK: Your third graph
+gapminder %>%
+  filter(year == year_min | year == year_max) %>%
+  ggplot(mapping = aes(x = lifeExp, group = year, fill = year)) +
+    geom_density(alpha = 0.25)
 ```
 
-- (Your notes and observations here)
+- In 1952, there are two peaks in the life expectancy curve, one prominent peak around 40 years and another less prominent bump around 65 years. It is right skewed.
+- In 2007, the life expectancy curve has shifted rightwards, and there is one prominent peak around 75 years. It is left skewed.
+- In 1952, are the countries in the peak around 40 years primarily countries in the "Global South" (countries that were colonized)? How many of those countries saw a large jump in life expectancy from 1952 to 2007? 
