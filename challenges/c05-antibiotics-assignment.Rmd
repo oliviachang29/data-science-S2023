@@ -1,7 +1,7 @@
 ---
 title: "Antibiotics"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-03-06
 output:
   github_document
 ---
@@ -69,12 +69,29 @@ For all five of the visuals, you must show information on *all 16 bacteria*. For
 
 *Hint 2*: The data `df_antibiotics` are in a *wide* format; it may be helpful to `pivot_longer()` the data to make certain visuals easier to construct.
 
+```{r}
+df_antibiotics_longer <-
+  df_antibiotics %>%
+  pivot_longer(
+    cols = c("penicillin", "streptomycin", "neomycin"),
+    names_to = "drug",
+    values_to = "mic"
+  )
+
+df_antibiotics_longer
+```
+
+
 #### Visual 1 (All variables)
 
 In this visual you must show *all three* effectiveness values for *all 16 bacteria*. You must also show whether or not each bacterium is Gram positive or negative.
 
 ```{r q1.1}
-# WRITE YOUR CODE HERE
+df_antibiotics_longer %>%
+    ggplot() +
+    geom_point(mapping = aes(x = bacteria, y = mic, color = drug, shape = gram)) + coord_flip() + scale_y_continuous(trans='log2') +
+    geom_hline(yintercept = 0.1, linetype = "dashed")
+
 ```
 
 #### Visual 2 (All variables)
@@ -84,7 +101,13 @@ In this visual you must show *all three* effectiveness values for *all 16 bacter
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.2}
-# WRITE YOUR CODE HERE
+
+df_antibiotics_longer %>%
+    ggplot() +
+    geom_point(mapping = aes(x = drug, y = mic, color = gram)) + scale_y_continuous(trans='log2') +
+    facet_wrap(.~ bacteria) +
+    geom_hline(yintercept=0.1, linetype="dashed")
+
 ```
 
 #### Visual 3 (Some variables)
@@ -95,6 +118,11 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.3}
 # WRITE YOUR CODE HERE
+df_antibiotics_longer %>%
+  ggplot() +
+    geom_point(mapping = aes(x = gram, y = mic, color = bacteria)) + facet_wrap( .~ drug ) +
+    geom_hline(yintercept = 0.1, linetype="dashed") +
+     scale_y_continuous(trans='log2')
 ```
 
 #### Visual 4 (Some variables)
@@ -104,7 +132,14 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.4}
-# WRITE YOUR CODE HERE
+df_antibiotics %>%
+  ggplot(mapping = aes(x = neomycin, y = streptomycin, label = bacteria)) +
+    geom_point() +
+    geom_label() +
+    geom_hline(yintercept = 0.1, linetype="dashed") +
+    geom_vline(xintercept = 0.1, linetype="dashed") +
+    scale_y_continuous(trans='log2') + 
+    scale_x_continuous(trans='log2')
 ```
 
 #### Visual 5 (Some variables)
@@ -115,6 +150,17 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.5}
 # WRITE YOUR CODE HERE
+
+# TODO add title for penicillin
+
+df_antibiotics_longer %>%
+  # filter(drug == "penicillin") %>%
+  ggplot() +
+    geom_point(mapping = aes(x = bacteria, y = mic, color = gram, shape = drug))  +
+    coord_flip() +
+    geom_hline(yintercept = 0.1, linetype="dashed") +
+    scale_y_continuous(trans='log2')
+
 ```
 
 ### __q2__ Assess your visuals
@@ -130,12 +176,15 @@ There are **two questions** below; use your five visuals to help answer both Gui
 > How do the three antibiotics vary in their effectiveness against bacteria of different genera and Gram stain?
 
 *Observations*
+
 - What is your response to the question above?
-  - (Write your response here)
+  - Neomycin appears to be more effective than streptomycin and penicillin against the bacteria in this dataset. Neomycin is effective against 9 bacteria in the dataset (regardless of gram strain), whereas pencillin is effective against 5 bacteria and streptomycin is effective against 4.
+  - Pencillin seems to be incredibly ineffective against certain strains of bacteria including Aerobacter aerogenes, Klebsiella pneumoniae, Mycobacterium tuberculosis, and Pseudomonas aeruginosa, which all have MIC scores of 800 or greater.
+  - In general, the three antibiotics are more effective against gram positive strains than gram negative strains.
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  - Visual 3 is most effective at helping to answer this question.
 - Why?
-  - (Write your response here)
+  - The question is asking about the different effectiveness of each antibiotic for the given bacteria and Gram strain. Visual 3 sorts by antibiotic and then by gram strain, and delineates between bacteria for which the antibiotic is effective and bacteria for which it is not effective with the horizontal line at MIC of 0.1. This makes it clear that neomycin is effective for the most bacteria, and that in general the three antibiotics are effective for more gram positive strains compared to gram negative strains.
 
 #### Guiding Question 2
 
@@ -144,12 +193,13 @@ In 1974 *Diplococcus pneumoniae* was renamed *Streptococcus pneumoniae*, and in 
 > Why was *Diplococcus pneumoniae* was renamed *Streptococcus pneumoniae*?
 
 *Observations*
+
 - What is your response to the question above?
-  - (Write your response here)
+  - Diplococcus pneuomniae was renamed to streptococcus pneumoniae because it behaves similarly in forming chains to other strains of streptococcus.
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  - Visual 4 is most effective at helping to answer this question.
 - Why?
-  - (Write your response here)
+  - By plotting the MIC values of neomycin and streptomycin against each other for each bacteria, we can see that diplococcus pneumoniae has similar MIC values to other streptococcus bacteria as it is clustered alongside including streptococus hemolyticus and streptococcus viridians. This suggests that diplococcus pneumoniae reacts similarly in the presence of antibiotics as other streptococcus bacteria.
 
 
 # References
