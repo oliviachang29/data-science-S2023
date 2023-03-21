@@ -36,7 +36,7 @@ library(gapminder)
 gapminder %>%
   filter(continent == "Asia") %>%
   ggplot(aes(year, lifeExp)) +
-  geom_line()
+  geom_line(mapping = aes(color = country))
 ```
 
 ### __q2__ A line plot makes *a certain assumption* about the underlying data. What assumption is this? How does that assumption relate to the following graph? Put differently, why is the use of `geom_line` a bad idea for the following dataset?
@@ -51,7 +51,9 @@ mpg %>%
 
 **Observations**:
 - What does a line plot assume about the data?
+- The line plot assumes that the data is connected in some form - for example that it is the same "thing we are observing" just observed at different points in time.
 - How does the `mpg` dataset violate this assumption?
+- The mpg dataset contains different vehicles - so they are different "things we are observing", and it is not just being observed at different points in time.
 
 ### __q3__ The following graph shows both the raw data and a smoothed version. Describe the trends that you can see in the different curves.
 
@@ -66,7 +68,9 @@ economics %>%
 
 **Observations**:
 - What can you tell based on the `Raw` data?
+- Based on the raw data, the unemployment rate seems to oscillate up and down and often spikes rapidly and then decreases after a period of time.
 - What can you tell based on the `Smoothed` data?
+- The unemployment rate is generally increasing although it generally decreased for a period of time in the 1990s.
 
 <!-- include-exit-ticket -->
 # Exit Ticket

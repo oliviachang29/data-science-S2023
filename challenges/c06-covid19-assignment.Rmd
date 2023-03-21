@@ -1,7 +1,7 @@
 ---
 title: "COVID-19"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-03-21
 output:
   github_document:
     toc: true
@@ -78,7 +78,8 @@ That's the high-level view; now let's dig into the details.
 
 ```{r q1-task}
 ## TASK: Load the census bureau data with the following tibble name.
-df_pop <- NA
+df_pop <- read_csv("c06-data/ACSDT5Y2018.B01003-Data.csv", skip = 1)
+df_pop
 ```
 
 *Note*: You can find information on 1-year, 3-year, and 5-year estimates [here](https://www.census.gov/programs-surveys/acs/guidance/estimates.html). The punchline is that 5-year estimates are more reliable but less current.
@@ -94,7 +95,9 @@ The New York Times is publishing up-to-date data on COVID-19 on [GitHub](https:/
 
 ```{r q2-task}
 ## TASK: Find the URL for the NYT covid-19 county-level data
-url_counties <- NA_character_
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-2020.csv"
+
+# Note: The proper URL to use would be https://github.com/nytimes/covid-19-data/raw/master/rolling-averages/us-counties.csv, however that dataset is structured differently than how this challenge assumes it should be (it has a GEO ID column instead of a fips code). Instead, I decided to use the 2020 county data.
 ```
 
 Once you have the url, the following code will download a local copy of the data, then load the data into R.
@@ -134,8 +137,14 @@ To join these datasets, we'll need to use [FIPS county codes](https://en.wikiped
 ### __q3__ Process the `id` column of `df_pop` to create a `fips` column.
 
 ```{r q3-task}
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
 ## TASK: Create a `fips` column by extracting the county code
-df_q3 <- NA
+df_q3 <- df_pop %>%
+  mutate(fips = substrRight(Geography, 5))
+
+df_q3
 ```
 
 Use the following test to check your answer.
@@ -155,7 +164,10 @@ print("Very good!")
 
 ```{r q4-task}
 ## TASK: Join df_covid and df_q3 by fips.
-df_q4 <- NA
+df_q4 <- df_covid %>%
+  left_join(df_q3, by = "fips")
+
+df_q4
 ```
 
 For convenience, I down-select some columns and produce more convenient column
@@ -189,7 +201,10 @@ Now that we've done the hard work of loading and wrangling the data, we can fina
 ```{r q5-task}
 ## TASK: Normalize cases and deaths
 df_normalized <-
-  df_data
+  df_data %>%
+    mutate(cases_per100k = cases / population * 100000, deaths_per100k = deaths / population * 100000)
+
+df_normalized
 ```
 
 You may use the following test to check your work.
@@ -237,19 +252,60 @@ Before turning you loose, let's complete a couple guided EDA tasks.
 
 ```{r q6-task}
 ## TASK: Compute mean and sd for cases_per100k and deaths_per100k
+# Finding SD and mean across all dates
+df_normalized %>%
+  drop_na(cases_per100k, deaths_per100k) %>%
+  summarize(
+   cases_per100k_sd = sd(cases_per100k),
+   cases_per100k_mean = mean(cases_per100k),
+   deaths_per100k_sd = sd(deaths_per100k),
+   deaths_per100k_mean = mean(deaths_per100k),
+  )
+
+
+# Finding SD and mean for each day - that generally makes more sense for this dataset than averaging across all dates
+df_normalized %>%
+  group_by(date) %>%
+  drop_na(cases_per100k, deaths_per100k) %>%
+  summarize(
+   cases_per100k_sd = sd(cases_per100k),
+   cases_per100k_mean = mean(cases_per100k),
+   deaths_per100k_sd = sd(deaths_per100k),
+   deaths_per100k_mean = mean(deaths_per100k),
+  )
+
 ```
 
 ### __q7__ Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of `deaths_per100k`. Report the population of each county along with the per-100,000 counts. Compare the counts against the mean values you found in q6. Note any observations.
 
 ```{r q7-task}
-## TASK: Find the top 10 max cases_per100k counties; report populations as well
+df_normalized_with_avg <- df_normalized %>%
+  group_by(fips) %>%
+  summarize(cases_per100k_avg = mean(cases_per100k), deaths_per100k_avg = mean(deaths_per100k))
+
+## TASK: Find the top 10 cases_per100k counties; report populations as well
+df_normalized_with_avg %>%
+  arrange(desc(cases_per100k_avg)) %>%
+  head(10) %>%
+  inner_join(df_normalized, by = "fips") %>%
+  distinct(fips, .keep_all = TRUE) %>%
+  select(c("fips", "county", "state", "cases_per100k_avg", "population"))
+  
 
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
+df_normalized_with_avg %>%
+  arrange(desc(deaths_per100k_avg)) %>%
+  head(10) %>%
+  inner_join(df_normalized, by = "fips") %>%
+  distinct(fips, .keep_all = TRUE) %>%
+  select(c("fips", "county", "state", "deaths_per100k_avg", "population"))
 ```
 
 **Observations**:
 
-- (Note your observations here!)
+- The cases_per100k average is about 5 to 10 times greater for the 10 counties with the highest cases_per100k average than the average cases_per100k across all counties.
+- The deaths_per100k average is about 6 to 10 times greater for the 10 counties with the highest deaths_per100k average compared to the average deaths_per100k across all counties.
+- The top 10 counties in both calculations both have relatively small populations - all are below 30,000.
 
 ## Self-directed EDA
 <!-- ------------------------- -->
@@ -266,7 +322,87 @@ Before turning you loose, let's complete a couple guided EDA tasks.
 - Fix the *geographic exceptions* noted below to study New York City.
 - Your own idea!
 
-**DO YOUR OWN ANALYSIS HERE**
+```{r}
+# col_types = c("c", "c", "i", )
+# Load Race dataset for 2021
+df_race <- read_csv("c06-data/ACSDT1y2021.B02001-Data.csv", skip = 1, col_select = c("Geography", "Geographic Area Name", "Estimate!!Total:", "Estimate!!Total:!!White alone")) %>%
+  select(c(
+    "Geography", 
+    "Geographic Area Name",
+    population = "Estimate!!Total:",
+    population_white = "Estimate!!Total:!!White alone")
+  ) %>%
+  mutate_at(c('population', 'population_white'), as.numeric) 
+df_race
+```
+```{r}
+# get fips code for race dataset and calculate % white for each county
+df_race_2 <- df_race %>%
+  mutate(fips = substrRight(Geography, 5),
+         pct_white = population_white/population)
+
+df_race_2
+```
+
+```{r}
+df_normalized_with_avg_and_county_names <- df_normalized %>%
+  select("fips", "county", "state") %>%
+  distinct(fips, .keep_all = TRUE) %>%
+  right_join(df_normalized_with_avg, by = "fips")
+
+df_normalized_with_avg_and_county_names
+```
+
+```{r}
+# join race dataset with normalized dataset from above and select only california counties
+
+df_data_race_ca <- df_normalized_with_avg_and_county_names %>%
+  left_join(df_race_2, by = "fips") %>%
+  filter(state == c("California")) %>%
+  drop_na("Geography") %>%
+  arrange(desc(deaths_per100k_avg)) %>%
+  distinct(fips, .keep_all = TRUE)
+
+df_data_race_ca
+```
+
+
+```{r}
+# calculate worst death count for each county 
+
+library(ggrepel)
+
+df_data_race_ca_leftmost <- df_data_race_ca %>%
+  head(1)
+
+df_data_race_ca_rightmost <- df_data_race_ca %>%
+  arrange(deaths_per100k_avg) %>%
+  head(1)
+
+# compare death counts for majority white vs. majority minority counties in California
+
+# get correlation value
+pct_white_deaths_per_100k_avg <- 
+  cor(x = df_data_race_ca %>% pull(pct_white), y = df_data_race_ca %>% pull(deaths_per100k_avg)) %>%
+  round(3)
+
+
+# plot
+df_data_race_ca %>%
+  ggplot(mapping = aes(x = pct_white, y = deaths_per100k_avg, label = county)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  geom_label_repel(data = df_data_race_ca_leftmost) + 
+  geom_label_repel(data = df_data_race_ca_rightmost) +
+  geom_vline(xintercept = 0.5, color = "red", linetype = "dashed") +
+  xlab("% white in 2021") +
+  ylab("Average deaths per 100k per county in 2020") +
+  annotate("text", x = 0.8, y = 110, label=paste("R value", pct_white_deaths_per_100k_avg))
+
+
+```
+
+This graph displays the average deaths per 100k in 2020 for each county in California and compares it to the racial makeup of that county, specifically the % white in the county. There is a general downward trend and the r value of -0.572 indicates that generally as the percent white in the county increases, the average deaths per 100k decreases for California counties in 2020.
 
 ### Aside: Some visualization tricks
 <!-- ------------------------- -->
@@ -275,20 +411,20 @@ These data get a little busy, so it's helpful to know a few `ggplot` tricks to h
 
 ```{r ma-example}
 ## NOTE: No need to change this; just an example
-df_normalized %>%
-  filter(state == "Massachusetts") %>%
-
-  ggplot(
-    aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
-  ) +
-  geom_line() +
-  scale_y_log10(labels = scales::label_number_si()) +
-  scale_color_discrete(name = "County") +
-  theme_minimal() +
-  labs(
-    x = "Date",
-    y = "Cases (per 100,000 persons)"
-  )
+# df_normalized %>%
+#   filter(state == "Massachusetts") %>%
+# 
+#   ggplot(
+#     aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
+#   ) +
+#   geom_line() +
+#   scale_y_log10(labels = scales::label_number_si()) +
+#   scale_color_discrete(name = "County") +
+#   theme_minimal() +
+#   labs(
+#     x = "Date",
+#     y = "Cases (per 100,000 persons)"
+#   )
 ```
 
 *Tricks*:
