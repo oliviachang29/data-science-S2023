@@ -1,7 +1,7 @@
 ---
 title: "Estimating Pi With a Shotgun"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-3-24
 output:
   github_document:
     toc: true
@@ -100,17 +100,34 @@ Remember in `e-stat02-probability` we learned how to estimate probabilities as t
 *Hint*: Remember that the mean of an *indicator function* on your target set will estimate the probability of points landing in that area (see `e-stat02-probability`). Based on the expression above, you'll need to *modify* that indicator to produce an estimate of $\pi$.
 
 ```{r q1-task}
+set.seed(1010)
 ## TASK: Choose a sample size and generate samples
-n <- NA_real_ # Choose a sample size
-df_q1 <- NA # Generate the data
+n <- 10000 # Choose a sample size
+df_q1 <- 
+  tibble(
+    x = runif(n), # default max/min is 0, 1
+    y = runif(n)
+  )# Generate the data
+
+df_q1
 ```
 
 ### __q2__ Using your data in `df_q1`, estimate $\pi$.
 
 ```{r q2-task}
 ## TASK: Estimate pi using your data from q1
-pi_est <- NA_real_
-pi_est
+df_q2 <- df_q1 %>%
+  mutate(
+    point_in_circle = (x^2 + y^2) < 1
+  ) %>%
+  summarize(
+    point_in_circle_mean = mean(point_in_circle),
+    pi_est =  point_in_circle_mean * 4,
+    point_in_circle_sd = sd(point_in_circle),
+    point_in_circle_se = point_in_circle_sd / sqrt(n)
+  )
+
+df_q2
 ```
 
 # Quantifying Uncertainty
@@ -121,16 +138,24 @@ You now have an estimate of $\pi$, but how trustworthy is that estimate? In `e-s
 ### __q3__ Using a CLT approximation, produce a confidence interval for your estimate of $\pi$. Make sure you specify your confidence level. Does your interval include the true value of $\pi$? Was your chosen sample size sufficiently large so as to produce a trustworthy answer?
 
 ```{r q3-task}
+
+q95 <- qnorm( 1 - (1 - 0.95) / 2 )
+lo_pi <- (df_q2$point_in_circle_mean - q95 * df_q2$point_in_circle_se) * 4
+hi_pi <- (df_q2$point_in_circle_mean + q95 * df_q2$point_in_circle_se) * 4
+
+lo_pi
+hi_pi
+
 ```
 
 **Observations**:
 
 - Does your interval include the true value of $\pi$?
-  - (Your response here)
+  - Yes
 - What confidence level did you choose?
-  - (Your response here)
+  - I chose a 95% confidence interval
 - Was your sample size $n$ large enough? Why do you say that?
-  - (Your response here)
+  - The sample size n that I chose was 10,000 points. We are only trying to get a reasonable estimate of pi in order to demonstrate the Monte Carlo theorem, so it does not need to be extremely precise, and the sample size was large enough that a 95% confidence interval did include the true value of pi, so the sample size was large enough for our purposes.
 
 # References
 <!-- -------------------------------------------------- -->
