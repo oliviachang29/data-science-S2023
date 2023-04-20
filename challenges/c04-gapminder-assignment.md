@@ -225,7 +225,8 @@ can.
 gapminder %>%
   filter(year == year_min & gdpPercap < 60000) %>%
   ggplot() +
-    geom_boxplot(mapping = aes(x = continent, y = gdpPercap))
+  geom_boxplot(mapping = aes(x = continent, y = gdpPercap)) +
+  scale_y_log10()
 ```
 
 ![](c04-gapminder-assignment_files/figure-gfm/q2-task-1.png)<!-- -->
@@ -375,6 +376,8 @@ gapminder %>%
 ```
 
 ![](c04-gapminder-assignment_files/figure-gfm/q5-task1-1.png)<!-- -->
+Question: How does life expectancy change over time for three African
+countries that were once Belgian colonies?
 
 - This graph displays life expectancy vs. year for three African
   countries that were once Belgian colonies: Burundi, the DRC, and
@@ -397,6 +400,8 @@ gapminder %>%
 ```
 
 ![](c04-gapminder-assignment_files/figure-gfm/q5-task2-1.png)<!-- -->
+Question: How does gdp per capita change over time for three former
+British colonies?
 
 - This graph displays gdp per capita over time for three former British
   colonies: Malaysia, Singapore, and Uganda.
@@ -416,6 +421,8 @@ gapminder %>%
 ```
 
 ![](c04-gapminder-assignment_files/figure-gfm/q5-task3-1.png)<!-- -->
+Question: How does the life expectancy curve from 1952 compare to the
+life expectancy curve in 2007?
 
 - In 1952, there are two peaks in the life expectancy curve, one
   prominent peak around 40 years and another less prominent bump around

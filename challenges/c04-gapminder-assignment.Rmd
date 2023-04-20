@@ -108,7 +108,8 @@ You may encounter difficulties in visualizing these data; if so document your ch
 gapminder %>%
   filter(year == year_min & gdpPercap < 60000) %>%
   ggplot() +
-    geom_boxplot(mapping = aes(x = continent, y = gdpPercap))
+  geom_boxplot(mapping = aes(x = continent, y = gdpPercap)) +
+  scale_y_log10()
 ```
 Note: for visual clarity, this graph is missing Kuwait, which had a gdpPercap of 108382.353 in 1952.
 
@@ -201,12 +202,14 @@ Now it's your turn! We just went through guided EDA considering the GDP per capi
 
 ### __q5__ Create *at least* three new figures below. With each figure, try to pose new questions about the data.
 
+
 ```{r q5-task1}
 gapminder %>%
   filter(country == "Burundi" | country == "Rwanda" | country == "Congo, Dem. Rep.") %>%
   ggplot(mapping = aes(x = year, y = lifeExp)) +
     geom_line(mapping = aes(color = country))
 ```
+Question: How does life expectancy change over time for three African countries that were once Belgian colonies?
 
 - This graph displays life expectancy vs. year for three African countries that were once Belgian colonies: Burundi, the DRC, and Rwanda. 
 - Life expectancy is generally increasing over time, but all three countries have a dip in life expectancy in the 1990s. What is the reason for each dip in life expectancy, and why do all three dips happen in the same decade?
@@ -219,6 +222,7 @@ gapminder %>%
   ggplot(mapping = aes(x = year, y = gdpPercap)) +
     geom_line(mapping = aes(color = country))
 ```
+Question: How does gdp per capita change over time for three former British colonies?
 
 - This graph displays gdp per capita over time for three former British colonies: Malaysia, Singapore, and Uganda.
 - Singapore's gdp per capita has increased at a much faster rate than Malaysia and Uganda. Relative to Malaysia and Singapore, Uganda's gdp per capita has remained relatively flat over time.
@@ -230,6 +234,7 @@ gapminder %>%
   ggplot(mapping = aes(x = lifeExp, group = year, fill = year)) +
     geom_density(alpha = 0.25)
 ```
+Question: How does the life expectancy curve from 1952 compare to the life expectancy curve in 2007?
 
 - In 1952, there are two peaks in the life expectancy curve, one prominent peak around 40 years and another less prominent bump around 65 years. It is right skewed.
 - In 2007, the life expectancy curve has shifted rightwards, and there is one prominent peak around 75 years. It is left skewed.
