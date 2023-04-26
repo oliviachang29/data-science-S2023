@@ -89,7 +89,7 @@ In this visual you must show *all three* effectiveness values for *all 16 bacter
 ```{r q1.1}
 df_antibiotics_longer %>%
     ggplot() +
-    geom_point(mapping = aes(x = bacteria, y = mic, color = drug, shape = gram)) + coord_flip() + scale_y_continuous(trans='log2') +
+    geom_point(mapping = aes(x = bacteria, y = mic, color = drug, shape = gram)) + coord_flip() + scale_y_continuous(trans='log10') +
     geom_hline(yintercept = 0.1, linetype = "dashed")
 
 ```
@@ -104,9 +104,10 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 df_antibiotics_longer %>%
     ggplot() +
-    geom_point(mapping = aes(x = drug, y = mic, color = gram)) + scale_y_continuous(trans='log2') +
+    geom_point(mapping = aes(x = drug, y = mic, color = gram)) + scale_y_continuous(trans='log10') +
     facet_wrap(.~ bacteria) +
-    geom_hline(yintercept=0.1, linetype="dashed")
+    geom_hline(yintercept=0.1, linetype="dashed") +
+    theme(axis.text.x = element_text(angle = 90))
 
 ```
 
@@ -122,7 +123,7 @@ df_antibiotics_longer %>%
   ggplot() +
     geom_point(mapping = aes(x = gram, y = mic, color = bacteria)) + facet_wrap( .~ drug ) +
     geom_hline(yintercept = 0.1, linetype="dashed") +
-     scale_y_continuous(trans='log2')
+     scale_y_continuous(trans='log10')
 ```
 
 #### Visual 4 (Some variables)
@@ -138,8 +139,8 @@ df_antibiotics %>%
     geom_label() +
     geom_hline(yintercept = 0.1, linetype="dashed") +
     geom_vline(xintercept = 0.1, linetype="dashed") +
-    scale_y_continuous(trans='log2') + 
-    scale_x_continuous(trans='log2')
+    scale_y_continuous(trans='log10') + 
+    scale_x_continuous(trans='log10')
 ```
 
 #### Visual 5 (Some variables)
@@ -159,7 +160,7 @@ df_antibiotics_longer %>%
     geom_point(mapping = aes(x = bacteria, y = mic, color = gram, shape = drug))  +
     coord_flip() +
     geom_hline(yintercept = 0.1, linetype="dashed") +
-    scale_y_continuous(trans='log2')
+    scale_y_continuous(trans='log10')
 
 ```
 

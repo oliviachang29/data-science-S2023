@@ -182,7 +182,7 @@ positive or negative.
 ``` r
 df_antibiotics_longer %>%
     ggplot() +
-    geom_point(mapping = aes(x = bacteria, y = mic, color = drug, shape = gram)) + coord_flip() + scale_y_continuous(trans='log2') +
+    geom_point(mapping = aes(x = bacteria, y = mic, color = drug, shape = gram)) + coord_flip() + scale_y_continuous(trans='log10') +
     geom_hline(yintercept = 0.1, linetype = "dashed")
 ```
 
@@ -200,9 +200,10 @@ your other visuals.
 ``` r
 df_antibiotics_longer %>%
     ggplot() +
-    geom_point(mapping = aes(x = drug, y = mic, color = gram)) + scale_y_continuous(trans='log2') +
+    geom_point(mapping = aes(x = drug, y = mic, color = gram)) + scale_y_continuous(trans='log10') +
     facet_wrap(.~ bacteria) +
-    geom_hline(yintercept=0.1, linetype="dashed")
+    geom_hline(yintercept=0.1, linetype="dashed") +
+    theme(axis.text.x = element_text(angle = 90))
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.2-1.png)<!-- -->
@@ -222,7 +223,7 @@ df_antibiotics_longer %>%
   ggplot() +
     geom_point(mapping = aes(x = gram, y = mic, color = bacteria)) + facet_wrap( .~ drug ) +
     geom_hline(yintercept = 0.1, linetype="dashed") +
-     scale_y_continuous(trans='log2')
+     scale_y_continuous(trans='log10')
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.3-1.png)<!-- -->
@@ -243,8 +244,8 @@ df_antibiotics %>%
     geom_label() +
     geom_hline(yintercept = 0.1, linetype="dashed") +
     geom_vline(xintercept = 0.1, linetype="dashed") +
-    scale_y_continuous(trans='log2') + 
-    scale_x_continuous(trans='log2')
+    scale_y_continuous(trans='log10') + 
+    scale_x_continuous(trans='log10')
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.4-1.png)<!-- -->
@@ -269,7 +270,7 @@ df_antibiotics_longer %>%
     geom_point(mapping = aes(x = bacteria, y = mic, color = gram, shape = drug))  +
     coord_flip() +
     geom_hline(yintercept = 0.1, linetype="dashed") +
-    scale_y_continuous(trans='log2')
+    scale_y_continuous(trans='log10')
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.5-1.png)<!-- -->

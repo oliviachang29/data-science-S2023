@@ -48,8 +48,9 @@ library(broom)
 
 ```{r q1-task}
 ## TODO: Download the data, move to your data folder, and load it
-filename <- NA_character_
+filename <- "data/yg821jf8611_ma_statewide_2020_04_01.rds"
 df_data <- readRDS(filename)
+df_data
 ```
 
 # EDA
@@ -57,6 +58,18 @@ df_data <- readRDS(filename)
 
 ### __q2__ Do your "first checks" on the dataset. What are the basic facts about this dataset?
 
+```{r}
+df_data
+```
+```{r}
+df_data %>% summary()
+```
+
+```{r}
+df_data %>% glimpse()
+```
+
+The dataset contains all traffic stops in Massachusetts from December 2006 to December 2015. It contains the stop date and location, as well as the race, sex, and age of the driver, whether a search was conducted (`search_conducted`) and why (`search_basis`), whether contrabound was found, the type of vehicle being driven and the license plate, whether a warning was issued, whether an arrest was made, etc.
 
 Note that we have both a `subject_race` and `race_Raw` column. There are a few possibilities as to what `race_Raw` represents:
 
@@ -69,14 +82,31 @@ Let's try to distinguish between these two possibilities.
 
 ```{r q3-task}
 ## TODO: Determine the factor levels for subject_race and raw_Race
-```
 
+# subject_race
+df_data %>%
+  pull(subject_race) %>%
+  levels()
+
+```
+```{r}
+# raw_Race
+df_data %>%
+  pull(raw_Race) %>%
+  as.factor() %>%
+  levels()
+```
 **Observations**:
 
 - What are the unique values for `subject_race`?
+The unique values for subject_race are asian/pacific islander, black, hispanic, white, other, and unknown.
 - What are the unique values for `raw_Race`?
+The unique values for raw_Race are A, American Indian or Alaskan Native, Asian or Pacific Islander, Black, Hispanic, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, White.
 - What is the overlap between the two sets?
+The overlapping values (ignoring the different capitalization) are Black, Hispanic, White.
 - What is the difference between the two sets?
+`subject_race` contains asian/pacific islander, other, and unknown and `raw_Race` does not.
+`raw_Race` contains A, American Indian or Alaskan Native, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, and `subject_race` does not.
 
 ### __q4__ Check whether `subject_race` and `raw_Race` match for a large fraction of cases. Which of the two hypotheses above is most likely, based on your results?
 
@@ -84,6 +114,31 @@ Let's try to distinguish between these two possibilities.
 
 ```{r q4-task}
 ## TODO: Devise your own way to test the hypothesis posed above.
+
+# need to convert raw_race to something that matches subject race
+
+df_q4 <- df_data %>%
+  select(c(subject_race, raw_Race)) %>%
+  mutate(raw_Race = fct_recode(raw_Race %>% as.factor(), 
+                               # factors that obviously map to one another
+                               white = "White",
+                               hispanic = "Hispanic",
+                               black = "Black",
+                               "asian/pacific islander" = "Asian or Pacific Islander",
+                               unknown = "None - for no operator present citations only",
+                               other = "American Indian or Alaskan Native",
+                               
+                               # factors where mapping is unclear
+                               # other = "A",
+                               # other = "Middle Eastern or East Indian (South Asian)",
+                               )) %>%
+  mutate(match = ifelse(subject_race %>% as.character() == raw_Race %>% as.character(), "definite", "unsure"))
+  
+  
+df_q4 %>%
+  group_by(match) %>%
+  drop_na(subject_race, raw_Race) %>%
+  summarize(n = n(), pct = n() / nrow(df_data))
 ```
 
 **Observations**
@@ -95,7 +150,7 @@ Between the two hypotheses:
 
 which is most plausible, based on your results?
 
-- (Your response here)
+- It is most plausible that `race_Raw` is the unprocessed version of `subject_race`. We can be sure that "white" in `subject_race` and "White" in `raw_Race` map to each other. We can also be sure that "hispanic" and "Hispanic", "black" and "Black", "asian/pacific islander" and "Asian or Pacific Islander", unknown and "None - for no operator present citations only", and "other" and "American Indian or Alaskan Native", map to each other. Once `raw_Race` is processed using those definite mappings, 98.1% of all the rows have `subject_race` and `race_Raw` values that match each other. It seems basically impossible that 98.1% of all the stops have police officers that match the race of the subject.
 
 ## Vis
 <!-- ------------------------- -->
@@ -103,6 +158,12 @@ which is most plausible, based on your results?
 ### __q5__ Compare the *arrest rate*---the fraction of total cases in which the subject was arrested---across different factors. Create as many visuals (or tables) as you need, but make sure to check the trends across all of the `subject` variables. Answer the questions under *observations* below.
 
 (Note: Create as many chunks and visuals as you need)
+
+```{r}
+df_data %>%
+  arrest_made
+```
+
 
 
 **Observations**:
