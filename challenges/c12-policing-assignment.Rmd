@@ -1,7 +1,7 @@
 ---
 title: "Massachusetts Highway Stops"
-author: "(Your name here)"
-date: 2020-
+author: "Olivia Chang"
+date: 2023-04-28
 output:
   github_document:
     toc: true
@@ -10,24 +10,28 @@ output:
 *Purpose*: In this last challenge we'll focus on using logistic regression to study a large, complicated dataset. Interpreting the results of a model can be challenging---both in terms of the statistics and the real-world reasoning---so we'll get some practice in this challenge.
 
 <!-- include-rubric -->
+
 # Grading Rubric
+
 <!-- -------------------------------------------------- -->
 
 Unlike exercises, **challenges will be graded**. The following rubrics define how you will be graded, both on an individual and team basis.
 
 ## Individual
+
 <!-- ------------------------- -->
 
-| Category | Needs Improvement | Satisfactory |
-|----------|----------------|--------------|
-| Effort | Some task __q__'s left unattempted | All task __q__'s attempted |
-| Observed | Did not document observations, or observations incorrect | Documented correct observations based on analysis |
-| Supported | Some observations not clearly supported by analysis | All observations clearly supported by analysis (table, graph, etc.) |
-| Assessed | Observations include claims not supported by the data, or reflect a level of certainty not warranted by the data | Observations are appropriately qualified by the quality & relevance of the data and (in)conclusiveness of the support |
-| Specified | Uses the phrase "more data are necessary" without clarification | Any statement that "more data are necessary" specifies which *specific* data are needed to answer what *specific* question |
-| Code Styled | Violations of the [style guide](https://style.tidyverse.org/) hinder readability | Code sufficiently close to the [style guide](https://style.tidyverse.org/) |
+| Category    | Needs Improvement                                                                                                | Satisfactory                                                                                                               |
+|------------------|-----------------------------|-------------------------|
+| Effort      | Some task **q**'s left unattempted                                                                               | All task **q**'s attempted                                                                                                 |
+| Observed    | Did not document observations, or observations incorrect                                                         | Documented correct observations based on analysis                                                                          |
+| Supported   | Some observations not clearly supported by analysis                                                              | All observations clearly supported by analysis (table, graph, etc.)                                                        |
+| Assessed    | Observations include claims not supported by the data, or reflect a level of certainty not warranted by the data | Observations are appropriately qualified by the quality & relevance of the data and (in)conclusiveness of the support      |
+| Specified   | Uses the phrase "more data are necessary" without clarification                                                  | Any statement that "more data are necessary" specifies which *specific* data are needed to answer what *specific* question |
+| Code Styled | Violations of the [style guide](https://style.tidyverse.org/) hinder readability                                 | Code sufficiently close to the [style guide](https://style.tidyverse.org/)                                                 |
 
 ## Due Date
+
 <!-- ------------------------- -->
 
 All the deliverables stated in the rubrics above are due **at midnight** before the day of the class discussion of the challenge. See the [Syllabus](https://docs.google.com/document/d/1qeP6DUS8Djq_A0HMllMqsSqX3a9dbcx1/edit?usp=sharing&ouid=110386251748498665069&rtpof=true&sd=true) for more information.
@@ -40,9 +44,10 @@ library(broom)
 ```
 
 # Setup
+
 <!-- -------------------------------------------------- -->
 
-### __q1__ Go to the [Stanford Open Policing Project](https://openpolicing.stanford.edu/data/) page and download the Massachusetts State Police records in `Rds` format. Move the data to your `data` folder and match the `filename` to load the data.
+### **q1** Go to the [Stanford Open Policing Project](https://openpolicing.stanford.edu/data/) page and download the Massachusetts State Police records in `Rds` format. Move the data to your `data` folder and match the `filename` to load the data.
 
 *Note*: An `Rds` file is an R-specific file format. The function `readRDS` will read these files.
 
@@ -54,13 +59,15 @@ df_data
 ```
 
 # EDA
+
 <!-- -------------------------------------------------- -->
 
-### __q2__ Do your "first checks" on the dataset. What are the basic facts about this dataset?
+### **q2** Do your "first checks" on the dataset. What are the basic facts about this dataset?
 
 ```{r}
 df_data
 ```
+
 ```{r}
 df_data %>% summary()
 ```
@@ -73,12 +80,12 @@ The dataset contains all traffic stops in Massachusetts from December 2006 to De
 
 Note that we have both a `subject_race` and `race_Raw` column. There are a few possibilities as to what `race_Raw` represents:
 
-- `race_Raw` could be the race of the police officer in the stop
-- `race_Raw` could be an unprocessed version of `subject_race`
+-   `race_Raw` could be the race of the police officer in the stop
+-   `race_Raw` could be an unprocessed version of `subject_race`
 
 Let's try to distinguish between these two possibilities.
 
-### __q3__ Check the set of factor levels for `subject_race` and `raw_Race`. What do you note about overlap / difference between the two sets?
+### **q3** Check the set of factor levels for `subject_race` and `raw_Race`. What do you note about overlap / difference between the two sets?
 
 ```{r q3-task}
 ## TODO: Determine the factor levels for subject_race and raw_Race
@@ -89,6 +96,7 @@ df_data %>%
   levels()
 
 ```
+
 ```{r}
 # raw_Race
 df_data %>%
@@ -96,19 +104,15 @@ df_data %>%
   as.factor() %>%
   levels()
 ```
+
 **Observations**:
 
-- What are the unique values for `subject_race`?
-The unique values for subject_race are asian/pacific islander, black, hispanic, white, other, and unknown.
-- What are the unique values for `raw_Race`?
-The unique values for raw_Race are A, American Indian or Alaskan Native, Asian or Pacific Islander, Black, Hispanic, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, White.
-- What is the overlap between the two sets?
-The overlapping values (ignoring the different capitalization) are Black, Hispanic, White.
-- What is the difference between the two sets?
-`subject_race` contains asian/pacific islander, other, and unknown and `raw_Race` does not.
-`raw_Race` contains A, American Indian or Alaskan Native, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, and `subject_race` does not.
+-   What are the unique values for `subject_race`? The unique values for subject_race are asian/pacific islander, black, hispanic, white, other, and unknown.
+-   What are the unique values for `raw_Race`? The unique values for raw_Race are A, American Indian or Alaskan Native, Asian or Pacific Islander, Black, Hispanic, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, White.
+-   What is the overlap between the two sets? The overlapping values (ignoring the different capitalization) are Black, Hispanic, White.
+-   What is the difference between the two sets? `subject_race` contains asian/pacific islander, other, and unknown and `raw_Race` does not. `raw_Race` contains A, American Indian or Alaskan Native, Middle Eastern or East Indian (South Asian), None - for no operator present citations only, and `subject_race` does not.
 
-### __q4__ Check whether `subject_race` and `raw_Race` match for a large fraction of cases. Which of the two hypotheses above is most likely, based on your results?
+### **q4** Check whether `subject_race` and `raw_Race` match for a large fraction of cases. Which of the two hypotheses above is most likely, based on your results?
 
 *Note*: Just to be clear, I'm *not* asking you to do a *statistical* hypothesis test.
 
@@ -145,42 +149,73 @@ df_q4 %>%
 
 Between the two hypotheses:
 
-- `race_Raw` could be the race of the police officer in the stop
-- `race_Raw` could be an unprocessed version of `subject_race`
+-   `race_Raw` could be the race of the police officer in the stop
+-   `race_Raw` could be an unprocessed version of `subject_race`
 
 which is most plausible, based on your results?
 
-- It is most plausible that `race_Raw` is the unprocessed version of `subject_race`. We can be sure that "white" in `subject_race` and "White" in `raw_Race` map to each other. We can also be sure that "hispanic" and "Hispanic", "black" and "Black", "asian/pacific islander" and "Asian or Pacific Islander", unknown and "None - for no operator present citations only", and "other" and "American Indian or Alaskan Native", map to each other. Once `raw_Race` is processed using those definite mappings, 98.1% of all the rows have `subject_race` and `race_Raw` values that match each other. It seems basically impossible that 98.1% of all the stops have police officers that match the race of the subject.
+-   It is most plausible that `race_Raw` is the unprocessed version of `subject_race`. We can be sure that "white" in `subject_race` and "White" in `raw_Race` map to each other. We can also be sure that "hispanic" and "Hispanic", "black" and "Black", "asian/pacific islander" and "Asian or Pacific Islander", unknown and "None - for no operator present citations only", and "other" and "American Indian or Alaskan Native", map to each other. Once `raw_Race` is processed using those definite mappings, 98.1% of all the rows have `subject_race` and `race_Raw` values that match each other. It seems basically impossible that 98.1% of all the stops have police officers that match the race of the subject.
 
 ## Vis
+
 <!-- ------------------------- -->
 
-### __q5__ Compare the *arrest rate*---the fraction of total cases in which the subject was arrested---across different factors. Create as many visuals (or tables) as you need, but make sure to check the trends across all of the `subject` variables. Answer the questions under *observations* below.
+### **q5** Compare the *arrest rate*---the fraction of total cases in which the subject was arrested---across different factors. Create as many visuals (or tables) as you need, but make sure to check the trends across all of the `subject` variables. Answer the questions under *observations* below.
 
 (Note: Create as many chunks and visuals as you need)
 
 ```{r}
+# subject_sex
 df_data %>%
-  arrest_made
+  drop_na(subject_sex) %>%
+  group_by(subject_sex) %>%
+  summarize(total = n(),
+            num_arrests = sum(!is.na(arrest_made) & arrest_made == TRUE),
+            arrest_rate = num_arrests / total) %>%
+  ggplot() +
+  geom_bar(aes(x = subject_sex, y = arrest_rate), stat = "identity")
+
+
+
+# subject_race
+df_data %>%
+  drop_na(subject_race) %>%
+  group_by(subject_race) %>%
+  summarize(total = n(),
+            num_arrests = sum(!is.na(arrest_made) & arrest_made == TRUE),
+            arrest_rate = num_arrests / total) %>%
+  ggplot() +
+  geom_bar(aes(x = subject_race, y = arrest_rate), stat = "identity")
+
+
+# subject_age
+df_data %>%
+  group_by(subject_age) %>%
+  summarize(total = n(),
+            num_arrests = sum(!is.na(arrest_made) & arrest_made == TRUE),
+            arrest_rate = num_arrests / total) %>%
+  ggplot(aes(x = subject_age, y = arrest_rate)) +
+  geom_point()
+
+  
 ```
-
-
 
 **Observations**:
 
-- How does `arrest_rate` tend to vary with `subject_age`?
-  - (Your response here)
-- How does `arrest_rate` tend to vary with `subject_sex`?
-  - (Your response here)
-- How does `arrest_rate` tend to vary with `subject_race`?
-  - (Your response here)
+-   How does `arrest_rate` tend to vary with `subject_age`?
+    -   The arrest rate starts low (at age 10) then steadily increases as subject age increases until about age 27, after which it steadily decreases as subject age increases.
+-   How does `arrest_rate` tend to vary with `subject_sex`?
+    -   The arrest rate is higher for male subjects - approximately double that of female subjects.
+-   How does `arrest_rate` tend to vary with `subject_race`?
+    -   The arrest rate is highest for Hispanic drivers, then Black drivers, then other. Other than "unknown", AAPI drivers have the lowest arrest rate.
 
 # Modeling
+
 <!-- -------------------------------------------------- -->
 
 We're going to use a model to study the relationship between `subject` factors and arrest rate, but first we need to understand a bit more about *dummy variables*
 
-### __q6__ Run the following code and interpret the regression coefficients. Answer the the questions under *observations* below.
+### **q6** Run the following code and interpret the regression coefficients. Answer the the questions under *observations* below.
 
 ```{r q6-task}
 ## NOTE: No need to edit; inspect the estimated model terms.
@@ -200,10 +235,10 @@ fit_q6 %>% tidy()
 
 **Observations**:
 
-- Which `subject_race` levels are included in fitting the model?
-  - (Your response here)
-- Which `subject_race` levels have terms in the model?
-  - (Your response here)
+-   Which `subject_race` levels are included in fitting the model?
+    -   The white, black, and hispanic levels are included in fitting the model.
+-   Which `subject_race` levels have terms in the model?
+    -   The hispanic and white levels have terms in the models.
 
 You should find that each factor in the model has a level *missing* in its set of terms. This is because R represents factors against a *reference level*: The model treats one factor level as "default", and each factor model term represents a change from that "default" behavior. For instance, the model above treats `subject_sex==male` as the reference level, so the `subject_sexfemale` term represents the *change in probability* of arrest due to a person being female (rather than male).
 
@@ -211,48 +246,138 @@ The this reference level approach to coding factors is necessary for [technical 
 
 By default `glm` uses the first factor level present as the reference level. Therefore we can use `mutate(factor = fct_relevel(factor, "desired_level"))` to set our `"desired_level"` as the reference factor.
 
-### __q7__ Re-fit the logistic regression from q6 setting `"white"` as the reference level for `subject_race`. Interpret the the model terms and answer the questions below.
+### **q7** Re-fit the logistic regression from q6 setting `"white"` as the reference level for `subject_race`. Interpret the the model terms and answer the questions below.
 
 ```{r q7-task}
 ## TODO: Re-fit the logistic regression, but set "white" as the reference
 ## level for subject_race
+fit_q7 <-
+  glm(
+    formula = arrest_made ~ subject_age + subject_race + subject_sex,
+    data = df_data %>%
+      filter(
+        !is.na(arrest_made),
+        subject_race %in% c("white", "black", "hispanic")
+      ) %>%
+      mutate(subject_race = fct_relevel(subject_race, "white")),
+    family = "binomial",
+  )
 
 fit_q7 %>% tidy()
 ```
 
 **Observations**:
 
-- Which `subject_race` level has the highest probability of being arrested, according to this model? Which has the lowest probability?
-  - (Your response here)
-- What could explain this difference in probabilities of arrest across race? List **multiple** possibilities.
-  - (Your response here)
-- Look at the sent of variables in the dataset; do any of the columns relate to a potential explanation you listed?
-  - (Your response here)
+-   Which `subject_race` level has the highest probability of being arrested, according to this model? Which has the lowest probability?
+    -   Hispanic drivers have the highest probability of being arrested. White drivers have the lowest probability of being arrested.
+-   What could explain this difference in probabilities of arrest across race? List **multiple** possibilities.
+    -   Explanations to pacify conservative racist white people: Black and brown people are more likely to commit offenses that are arrestable (holding contraband). There are more Black and brown men driving than women, and men are more likely to commit offenses that are arrestable. Black and brown drivers tend to be younger, and young people are more likely to commit offenses that are arrestable.
+    -   Actual explanation: It is true that there is no agreement on the degree of statistical disparity that would clearly indicate unacceptable racial profiling - even the existence of disparity could be explained away by a non-racial characteristic such as differential criminality, which is just a difference, not an indication of bias. However, Soss and Weaver (2018) argue that Black and brown people are more likely to be arrested because policing is a part of a carceral state systematically imprisons Black and brown Americans. Traffic policing is one of the ways it does this. Baumgartner's (2018) study of North Carolina traffic stops in 2015 finds that young men or color are targeted for harsh outcomes, other things equal, even in routine traffic stops.
+        -   Tonry (1995) writes that while racial differences in criminality are real and cannot be ignored (some racial groups commit crimes at higher rates due to poverty and environments of deprivation), more importantly, a shift in policing in the 80s resulted in dramatic increases in black arrest, over and above what could be explained by differences in rates of involvement with crime.
+
+        -   Mainstream US culture reinforces the idea that minorities - particularly young males - are criminals, so police are more likely to believe that Black and brown people are criminals and treat them as such. There is evidence that particularly within the carceral state, those biases are especially strong - black suspects are typically shot in a higher percentage of the cases than an identically situated white suspect (Correll et al. 2002). Glaser (2015) shows that the effect of profiling is to exaggerate whatever criminality differences might be in the population - the targeted group is over-arrested with respect to their criminality, and the other group is under-policed. There is a high rate of error with arrests in traffic stops (Tyler et al. 2014).
+
+        -   Differential policing by place (police patroling more intensively in one area than another, usually more extensively in majority-minority areas or race-class subjugated communities) means that police are more likely to expect that minorities are criminals.
+-   Look at the sent of variables in the dataset; do any of the columns relate to a potential explanation you listed?
+    -   The presence of contraband (contraband_found, contraband_drugs, contraband_weapon) relates to the potential "differential criminality" explanation of Black and brown people being more likely to break the law.
 
 One way we can explain differential arrest rates is to include some measure indicating the presence of an arrestable offense. We'll do this in a particular way in the next task.
 
-### __q8__ Re-fit the model using a factor indicating the presence of contraband in the subject's vehicle. Answer the questions under *observations* below.
+### **q8** Re-fit the model using a factor indicating the presence of contraband in the subject's vehicle. Answer the questions under *observations* below.
 
 ```{r q8-task}
 ## TODO: Repeat the modeling above, but control for whether contraband was found
 ## during the police stop
+
+fit_q8 <-
+  glm(
+    formula = arrest_made ~ subject_age + subject_race + subject_sex + contraband_found,
+    data = df_data %>%
+      filter(
+        !is.na(arrest_made),
+        subject_race %in% c("white", "black", "hispanic")
+      ) %>%
+      mutate(subject_race = fct_relevel(subject_race, "white")),
+    family = "binomial",
+  )
+
 fit_q8 %>% tidy()
 ```
 
 **Observations**:
 
-- How does controlling for found contraband affect the `subject_race` terms in the model?
-  - (Your response here)
-- What does the *finding of contraband* tell us about the stop? What does it *not* tell us about the stop?
-  - (Your response here)
+-   How does controlling for found contraband affect the `subject_race` terms in the model?
+    -   If you control for found contraband, black motorists are less likely to be arrested compared to white motorists, while hispanic motorists are still more likely to be arrested compared to white motorists. However, the likelihood of hispanic motorists being arrested compared to white motorists is smaller when you control for contraband.
+-   What does the *finding of contraband* tell us about the stop? What does it *not* tell us about the stop?
+    -   Finding of contraband tells us that the police offer searched for contraband and found it. It does not tell us whether different races carry contraband at different rates. We do not know if police officers, once they search a motorist, are more inclined to search harder to find contraband on minorities than white people.
 
-### __q9__ Go deeper: Pose at least one more question about the data and fit at least one more model in support of answering that question.
+### **q9** Go deeper: Pose at least one more question about the data and fit at least one more model in support of answering that question.
 
+
+```{r}
+# From race dataset get % black
+# Load Race dataset for 2021
+df_race <- read_csv("c06-data/ACSDT1y2021.B02001-Data.csv", skip = 1, col_select = c("Geography", "Geographic Area Name", "Estimate!!Total:", "Estimate!!Total:!!Black or African American alone", "Estimate!!Total:!!Asian alone")) %>%
+  select(c(
+    "Geography", 
+    "Geographic Area Name",
+    population = "Estimate!!Total:",
+    population_black = "Estimate!!Total:!!Black or African American alone")) %>%
+  mutate_at(c('population','population_black'), as.numeric)  %>%
+  mutate(pct_black = population_black/population) %>%
+  rename(
+    geographic_area_name = "Geographic Area Name"
+  )
+```
+
+```{r}
+df_q9_bycounty <- df_data %>%
+  group_by(county_name) %>%
+  filter(
+    !is.na(arrest_made),
+    subject_race %in% c("white", "black")
+  ) %>%
+  mutate(subject_race = fct_relevel(subject_race, "white"))
+```
+```{r}
+fit_q9_by_county = do(df_q9_bycounty, 
+    glm(formula = arrest_made ~ subject_race,
+        data = .,
+        family = "binomial") %>% 
+    tidy())
+
+fit_q9_by_county
+```
+
+```{r}
+df_q9_2 <- fit_q9_by_county %>%
+  filter(term == "subject_raceblack") %>%
+  mutate(geographic_area_name = paste(county_name, ", Massachusetts", sep = "")) %>%
+  left_join(df_race, join_by(geographic_area_name)) %>%
+  drop_na(population) %>%
+  select(county_name, estimate, population, pct_black) %>%
+  rename(subject_raceblack_estimate = estimate)
+```
+
+```{r}
+library(ggrepel)
+df_q9_2 %>%
+  ggplot(aes(x = pct_black, y = subject_raceblack_estimate, label = county_name)) +
+  geom_point() +
+  geom_text_repel() +
+  xlab("% Black Population") +
+  ylab("Probability of Arrest for Black Drivers (vs. white drivers)")
+```
 **Observations**:
 
-- Document your question and findings
+- Question: Baumgartner writes that police are much more likely to pull over black people when they are in an area where there are very few black people. Does that hold for Massachusetts? In other words, are Black drivers more likely to be stopped in whiter counties?
+- There seems to be a general negative correlation between the percent black population in a given county and the probability of arrest for black drivers compared to white drivers.
+- Suffolk county has a higher probability of arrest for black drivers compared to white drivers than Norfolk and Middlesex, and both are whiter counties than Suffolk. However, Suffolk contains Boston (and is the only true metropolitan area in Massachusetts) so the policing system may be very different and there may be other factors we cannot account for.
+```
+
 
 ## Further Reading
+
 <!-- -------------------------------------------------- -->
 
-- Stanford Open Policing Project [findings](https://openpolicing.stanford.edu/findings/).
+-   Stanford Open Policing Project [findings](https://openpolicing.stanford.edu/findings/).
