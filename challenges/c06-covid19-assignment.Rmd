@@ -137,12 +137,9 @@ To join these datasets, we'll need to use [FIPS county codes](https://en.wikiped
 ### __q3__ Process the `id` column of `df_pop` to create a `fips` column.
 
 ```{r q3-task}
-substrRight <- function(x, n){
-  substr(x, nchar(x)-n+1, nchar(x))
-}
 ## TASK: Create a `fips` column by extracting the county code
 df_q3 <- df_pop %>%
-  mutate(fips = substrRight(Geography, 5))
+  mutate(fips = str_sub(Geography, 10))
 
 df_q3
 ```
@@ -279,33 +276,34 @@ df_normalized %>%
 ### __q7__ Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of `deaths_per100k`. Report the population of each county along with the per-100,000 counts. Compare the counts against the mean values you found in q6. Note any observations.
 
 ```{r q7-task}
-df_normalized_with_avg <- df_normalized %>%
+df_normalized_with_max <- df_normalized %>%
   group_by(fips) %>%
-  summarize(cases_per100k_avg = mean(cases_per100k), deaths_per100k_avg = mean(deaths_per100k))
+  summarize(cases_per100k_max = max(cases_per100k), deaths_per100k_max = max(deaths_per100k))
 
 ## TASK: Find the top 10 cases_per100k counties; report populations as well
-df_normalized_with_avg %>%
-  arrange(desc(cases_per100k_avg)) %>%
+df_normalized_with_max %>%
+  arrange(desc(cases_per100k_max)) %>%
   head(10) %>%
   inner_join(df_normalized, by = "fips") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  select(c("fips", "county", "state", "cases_per100k_avg", "population"))
+  select(c("fips", "county", "state", "cases_per100k_max","deaths_per100k_max", "population"))
   
 
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
-df_normalized_with_avg %>%
-  arrange(desc(deaths_per100k_avg)) %>%
+df_normalized_with_max %>%
+  arrange(desc(deaths_per100k_max)) %>%
   head(10) %>%
   inner_join(df_normalized, by = "fips") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  select(c("fips", "county", "state", "deaths_per100k_avg", "population"))
+  select(c("fips", "county", "state", "deaths_per100k_max", "cases_per100k_max", "population"))
 ```
 
 **Observations**:
 
-- The cases_per100k average is about 5 to 10 times greater for the 10 counties with the highest cases_per100k average than the average cases_per100k across all counties.
-- The deaths_per100k average is about 6 to 10 times greater for the 10 counties with the highest deaths_per100k average compared to the average deaths_per100k across all counties.
-- The top 10 counties in both calculations both have relatively small populations - all are below 30,000.
+- For the 10 counties with the maximum cases_per100k,the cases_per100k max are more than 10 times greater than mean cases_per100k across all dates. These counties also have a maximum deaths_per100k that is much greater than the mean deaths_per100k across all dates (computed in q6), which suggests that a large number of covid cases per capita could result in with a large number of covid deaths per capita. 
+- For the 10 counties with the maximum deaths_per100k,the deaths_per100k max are more than 10 times greater than mean deaths_per100k across all dates (computed in q6). These counties also have a maximum cases_per100k that is much greater than the mean cases_per100k across all dates, which again suggests that a large number of covid cases per capita could result in a large number of covid deaths per capita. 
+- The top 10 counties with maximum cases_per100k have greater populations than the top 10 counties with maximum deaths_per100k, but the top 10 counties in both calculations both have relatively small populations - all are below 30,000.
+- The top 10 counties with maximum cases_per100k are not the same as the top 10 counties with maximum deaths_per100k.
 
 ## Self-directed EDA
 <!-- ------------------------- -->
@@ -338,29 +336,29 @@ df_race
 ```{r}
 # get fips code for race dataset and calculate % white for each county
 df_race_2 <- df_race %>%
-  mutate(fips = substrRight(Geography, 5),
+  mutate(fips = str_sub(Geography, 10),
          pct_white = population_white/population)
 
 df_race_2
 ```
 
 ```{r}
-df_normalized_with_avg_and_county_names <- df_normalized %>%
+df_normalized_with_max_and_county_names <- df_normalized %>%
   select("fips", "county", "state") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  right_join(df_normalized_with_avg, by = "fips")
+  right_join(df_normalized_with_max, by = "fips")
 
-df_normalized_with_avg_and_county_names
+df_normalized_with_max_and_county_names
 ```
 
 ```{r}
 # join race dataset with normalized dataset from above and select only california counties
 
-df_data_race_ca <- df_normalized_with_avg_and_county_names %>%
+df_data_race_ca <- df_normalized_with_max_and_county_names %>%
   left_join(df_race_2, by = "fips") %>%
   filter(state == c("California")) %>%
   drop_na("Geography") %>%
-  arrange(desc(deaths_per100k_avg)) %>%
+  arrange(desc(deaths_per100k_max)) %>%
   distinct(fips, .keep_all = TRUE)
 
 df_data_race_ca
@@ -376,20 +374,20 @@ df_data_race_ca_leftmost <- df_data_race_ca %>%
   head(1)
 
 df_data_race_ca_rightmost <- df_data_race_ca %>%
-  arrange(deaths_per100k_avg) %>%
+  arrange(deaths_per100k_max) %>%
   head(1)
 
 # compare death counts for majority white vs. majority minority counties in California
 
 # get correlation value
-pct_white_deaths_per_100k_avg <- 
-  cor(x = df_data_race_ca %>% pull(pct_white), y = df_data_race_ca %>% pull(deaths_per100k_avg)) %>%
+pct_white_deaths_per_100k_max <- 
+  cor(x = df_data_race_ca %>% pull(pct_white), y = df_data_race_ca %>% pull(deaths_per100k_max)) %>%
   round(3)
 
 
 # plot
 df_data_race_ca %>%
-  ggplot(mapping = aes(x = pct_white, y = deaths_per100k_avg, label = county)) +
+  ggplot(mapping = aes(x = pct_white, y = deaths_per100k_max, label = county)) +
   geom_point() +
   geom_smooth(method = "loess") +
   geom_label_repel(data = df_data_race_ca_leftmost) + 
@@ -397,7 +395,7 @@ df_data_race_ca %>%
   geom_vline(xintercept = 0.5, color = "red", linetype = "dashed") +
   xlab("% white in 2021") +
   ylab("Average deaths per 100k per county in 2020") +
-  annotate("text", x = 0.8, y = 110, label=paste("R value", pct_white_deaths_per_100k_avg))
+  annotate("text", x = 0.8, y = 250, label=paste("R value", pct_white_deaths_per_100k_max))
 
 
 ```

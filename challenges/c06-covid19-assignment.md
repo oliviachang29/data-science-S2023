@@ -333,12 +333,9 @@ the NYT data `df_covid` already contains the `fips`.
 ### **q3** Process the `id` column of `df_pop` to create a `fips` column.
 
 ``` r
-substrRight <- function(x, n){
-  substr(x, nchar(x)-n+1, nchar(x))
-}
 ## TASK: Create a `fips` column by extracting the county code
 df_q3 <- df_pop %>%
-  mutate(fips = substrRight(Geography, 5))
+  mutate(fips = str_sub(Geography, 10))
 
 df_q3
 ```
@@ -575,17 +572,17 @@ df_normalized %>%
 ### **q7** Find the top 10 counties in terms of `cases_per100k`, and the top 10 in terms of `deaths_per100k`. Report the population of each county along with the per-100,000 counts. Compare the counts against the mean values you found in q6. Note any observations.
 
 ``` r
-df_normalized_with_avg <- df_normalized %>%
+df_normalized_with_max <- df_normalized %>%
   group_by(fips) %>%
-  summarize(cases_per100k_avg = mean(cases_per100k), deaths_per100k_avg = mean(deaths_per100k))
+  summarize(cases_per100k_max = max(cases_per100k), deaths_per100k_max = max(deaths_per100k))
 
 ## TASK: Find the top 10 cases_per100k counties; report populations as well
-df_normalized_with_avg %>%
-  arrange(desc(cases_per100k_avg)) %>%
+df_normalized_with_max %>%
+  arrange(desc(cases_per100k_max)) %>%
   head(10) %>%
   inner_join(df_normalized, by = "fips") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  select(c("fips", "county", "state", "cases_per100k_avg", "population"))
+  select(c("fips", "county", "state", "cases_per100k_max","deaths_per100k_max", "population"))
 ```
 
     ## Warning in inner_join(., df_normalized, by = "fips"): Each row in `x` is expected to match at most 1 row in `y`.
@@ -593,28 +590,29 @@ df_normalized_with_avg %>%
     ## ℹ If multiple matches are expected, set `multiple = "all"` to silence this
     ##   warning.
 
-    ## # A tibble: 10 × 5
-    ##    fips  county        state        cases_per100k_avg population
-    ##    <chr> <chr>         <chr>                    <dbl>      <dbl>
-    ##  1 47169 Trousdale     Tennessee               15155.       9573
-    ##  2 05079 Lincoln       Arkansas                10530.      13695
-    ##  3 47095 Lake          Tennessee               10389.       7526
-    ##  4 31043 Dakota        Nebraska                10288.      20317
-    ##  5 13053 Chattahoochee Georgia                  9089.      10767
-    ##  6 27105 Nobles        Minnesota                8822.      21839
-    ##  7 19021 Buena Vista   Iowa                     8670.      20260
-    ##  8 05077 Lee           Arkansas                 8035.       9398
-    ##  9 46017 Buffalo       South Dakota             7821.       2053
-    ## 10 12067 Lafayette     Florida                  7775.       8744
+    ## # A tibble: 10 × 6
+    ##    fips  county        state        cases_per100k_max deaths_per100k_max popul…¹
+    ##    <chr> <chr>         <chr>                    <dbl>              <dbl>   <dbl>
+    ##  1 08025 Crowley       Colorado                29254.              213.     5630
+    ##  2 47169 Trousdale     Tennessee               22553.              125.     9573
+    ##  3 46041 Dewey         South Dakota            21855.              208.     5779
+    ##  4 20137 Norton        Kansas                  21491.              456.     5486
+    ##  5 46009 Bon Homme     South Dakota            21194.              330.     6969
+    ##  6 05079 Lincoln       Arkansas                20591.              175.    13695
+    ##  7 13053 Chattahoochee Georgia                 20535.               37.2   10767
+    ##  8 46017 Buffalo       South Dakota            19971.              487.     2053
+    ##  9 47095 Lake          Tennessee               18708.              173.     7526
+    ## 10 19021 Buena Vista   Iowa                    18337.              128.    20260
+    ## # … with abbreviated variable name ¹​population
 
 ``` r
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
-df_normalized_with_avg %>%
-  arrange(desc(deaths_per100k_avg)) %>%
+df_normalized_with_max %>%
+  arrange(desc(deaths_per100k_max)) %>%
   head(10) %>%
   inner_join(df_normalized, by = "fips") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  select(c("fips", "county", "state", "deaths_per100k_avg", "population"))
+  select(c("fips", "county", "state", "deaths_per100k_max", "cases_per100k_max", "population"))
 ```
 
     ## Warning in inner_join(., df_normalized, by = "fips"): Each row in `x` is expected to match at most 1 row in `y`.
@@ -622,30 +620,41 @@ df_normalized_with_avg %>%
     ## ℹ If multiple matches are expected, set `multiple = "all"` to silence this
     ##   warning.
 
-    ## # A tibble: 10 × 5
-    ##    fips  county         state       deaths_per100k_avg population
-    ##    <chr> <chr>          <chr>                    <dbl>      <dbl>
-    ##  1 13141 Hancock        Georgia                   380.       8535
-    ##  2 13243 Randolph       Georgia                   333.       7087
-    ##  3 51595 Emporia city   Virginia                  305.       5381
-    ##  4 13273 Terrell        Georgia                   302.       8859
-    ##  5 31135 Perkins        Nebraska                  292.       2907
-    ##  6 51640 Galax city     Virginia                  279.       6638
-    ##  7 13099 Early          Georgia                   278.      10348
-    ##  8 28099 Neshoba        Mississippi               262.      29376
-    ##  9 35031 McKinley       New Mexico                255.      72849
-    ## 10 22037 East Feliciana Louisiana                 245.      19499
+    ## # A tibble: 10 × 6
+    ##    fips  county       state        deaths_per100k_max cases_per100k_max popula…¹
+    ##    <chr> <chr>        <chr>                     <dbl>             <dbl>    <dbl>
+    ##  1 20063 Gove         Kansas                     764.            12677.     2619
+    ##  2 46073 Jerauld      South Dakota               739.            12765.     2029
+    ##  3 38021 Dickey       North Dakota               644.            13843.     4970
+    ##  4 46053 Gregory      South Dakota               619.            11473.     4201
+    ##  5 46125 Turner       South Dakota               593.            11738.     8264
+    ##  6 38031 Foster       North Dakota               578.            16535.     3290
+    ##  7 55051 Iron         Wisconsin                  577.             9221.     5715
+    ##  8 46057 Hamlin       South Dakota               567.            10100      6000
+    ##  9 51595 Emporia city Virginia                   558.             7749.     5381
+    ## 10 13141 Hancock      Georgia                    551.             7862.     8535
+    ## # … with abbreviated variable name ¹​population
 
 **Observations**:
 
-- The cases_per100k average is about 5 to 10 times greater for the 10
-  counties with the highest cases_per100k average than the average
-  cases_per100k across all counties.
-- The deaths_per100k average is about 6 to 10 times greater for the 10
-  counties with the highest deaths_per100k average compared to the
-  average deaths_per100k across all counties.
-- The top 10 counties in both calculations both have relatively small
+- For the 10 counties with the maximum cases_per100k,the cases_per100k
+  max are more than 10 times greater than mean cases_per100k across all
+  dates. These counties also have a maximum deaths_per100k that is much
+  greater than the mean deaths_per100k across all dates (computed in
+  q6), which suggests that a large number of covid cases per capita
+  could result in with a large number of covid deaths per capita.
+- For the 10 counties with the maximum deaths_per100k,the deaths_per100k
+  max are more than 10 times greater than mean deaths_per100k across all
+  dates (computed in q6). These counties also have a maximum
+  cases_per100k that is much greater than the mean cases_per100k across
+  all dates, which again suggests that a large number of covid cases per
+  capita could result in a large number of covid deaths per capita.
+- The top 10 counties with maximum cases_per100k have greater
+  populations than the top 10 counties with maximum deaths_per100k, but
+  the top 10 counties in both calculations both have relatively small
   populations - all are below 30,000.
+- The top 10 counties with maximum cases_per100k are not the same as the
+  top 10 counties with maximum deaths_per100k.
 
 ## Self-directed EDA
 
@@ -716,7 +725,7 @@ df_race
 ``` r
 # get fips code for race dataset and calculate % white for each county
 df_race_2 <- df_race %>%
-  mutate(fips = substrRight(Geography, 5),
+  mutate(fips = str_sub(Geography, 10),
          pct_white = population_white/population)
 
 df_race_2
@@ -739,37 +748,37 @@ df_race_2
     ## #   ²​pct_white
 
 ``` r
-df_normalized_with_avg_and_county_names <- df_normalized %>%
+df_normalized_with_max_and_county_names <- df_normalized %>%
   select("fips", "county", "state") %>%
   distinct(fips, .keep_all = TRUE) %>%
-  right_join(df_normalized_with_avg, by = "fips")
+  right_join(df_normalized_with_max, by = "fips")
 
-df_normalized_with_avg_and_county_names
+df_normalized_with_max_and_county_names
 ```
 
     ## # A tibble: 3,219 × 5
-    ##    fips  county        state         cases_per100k_avg deaths_per100k_avg
+    ##    fips  county        state         cases_per100k_max deaths_per100k_max
     ##    <chr> <chr>         <chr>                     <dbl>              <dbl>
-    ##  1 53061 Snohomish     Washington                 783.              20.5 
-    ##  2 17031 Cook          Illinois                  2199.              70.8 
-    ##  3 06059 Orange        California                1084.              20.9 
-    ##  4 04013 Maricopa      Arizona                   2078.              42.0 
-    ##  5 06037 Los Angeles   California                1742.              38.7 
-    ##  6 06085 Santa Clara   California                 722.              11.5 
-    ##  7 25025 Suffolk       Massachusetts             2470.             102.  
-    ##  8 06075 San Francisco California                 788.               8.09
-    ##  9 55025 Dane          Wisconsin                 1494.               7.61
-    ## 10 06073 San Diego     California                1006.              15.5 
+    ##  1 53061 Snohomish     Washington                2948.               50.0
+    ##  2 17031 Cook          Illinois                  7536.              159. 
+    ##  3 06059 Orange        California                5252.               59.3
+    ##  4 04013 Maricopa      Arizona                   7580.              120. 
+    ##  5 06037 Los Angeles   California                7634.              102. 
+    ##  6 06085 Santa Clara   California                3635.               36.9
+    ##  7 25025 Suffolk       Massachusetts             6890.              174. 
+    ##  8 06075 San Francisco California                2670.               21.4
+    ##  9 55025 Dane          Wisconsin                 6512.               37.6
+    ## 10 06073 San Diego     California                4713.               46.4
     ## # … with 3,209 more rows
 
 ``` r
 # join race dataset with normalized dataset from above and select only california counties
 
-df_data_race_ca <- df_normalized_with_avg_and_county_names %>%
+df_data_race_ca <- df_normalized_with_max_and_county_names %>%
   left_join(df_race_2, by = "fips") %>%
   filter(state == c("California")) %>%
   drop_na("Geography") %>%
-  arrange(desc(deaths_per100k_avg)) %>%
+  arrange(desc(deaths_per100k_max)) %>%
   distinct(fips, .keep_all = TRUE)
 
 df_data_race_ca
@@ -778,18 +787,18 @@ df_data_race_ca
     ## # A tibble: 42 × 10
     ##    fips  county    state cases…¹ death…² Geogr…³ Geogr…⁴ popul…⁵ popul…⁶ pct_w…⁷
     ##    <chr> <chr>     <chr>   <dbl>   <dbl> <chr>   <chr>     <dbl>   <dbl>   <dbl>
-    ##  1 06025 Imperial  Cali…   4807.   109.  050000… Imperi…  179851   30270   0.168
-    ##  2 06107 Tulare    Cali…   2301.    38.8 050000… Tulare…  477054  178557   0.374
-    ##  3 06037 Los Ange… Cali…   1742.    38.7 050000… Los An… 9829544 2909096   0.296
-    ##  4 06099 Stanisla… Cali…   2009.    37.3 050000… Stanis…  552999  230860   0.417
-    ##  5 06031 Kings     Cali…   3621.    34.0 050000… Kings …  153443   55481   0.362
-    ##  6 06077 San Joaq… Cali…   1758.    33.5 050000… San Jo…  789410  246993   0.313
-    ##  7 06065 Riverside Cali…   1811.    32.6 050000… Rivers… 2458395  887331   0.361
-    ##  8 06047 Merced    Cali…   2167.    31.7 050000… Merced…  286461   86433   0.302
-    ##  9 06071 San Bern… Cali…   1997.    27.5 050000… San Be… 2194710  723292   0.330
-    ## 10 06039 Madera    Cali…   1806.    25.2 050000… Madera…  159410   60686   0.381
-    ## # … with 32 more rows, and abbreviated variable names ¹​cases_per100k_avg,
-    ## #   ²​deaths_per100k_avg, ³​Geography, ⁴​`Geographic Area Name`, ⁵​population,
+    ##  1 06025 Imperial  Cali…  12356.   232.  050000… Imperi…  179851   30270   0.168
+    ##  2 06099 Stanisla… Cali…   6958.   114.  050000… Stanis…  552999  230860   0.417
+    ##  3 06037 Los Ange… Cali…   7634.   102.  050000… Los An… 9829544 2909096   0.296
+    ##  4 06047 Merced    Cali…   7226.    96.6 050000… Merced…  286461   86433   0.302
+    ##  5 06077 San Joaq… Cali…   6225.    88.9 050000… San Jo…  789410  246993   0.313
+    ##  6 06107 Tulare    Cali…   7263.    88.2 050000… Tulare…  477054  178557   0.374
+    ##  7 06065 Riverside Cali…   7576.    83.3 050000… Rivers… 2458395  887331   0.361
+    ##  8 06039 Madera    Cali…   6768.    75.5 050000… Madera…  159410   60686   0.381
+    ##  9 06031 Kings     Cali…  10737.    73.3 050000… Kings …  153443   55481   0.362
+    ## 10 06071 San Bern… Cali…   9103.    67.7 050000… San Be… 2194710  723292   0.330
+    ## # … with 32 more rows, and abbreviated variable names ¹​cases_per100k_max,
+    ## #   ²​deaths_per100k_max, ³​Geography, ⁴​`Geographic Area Name`, ⁵​population,
     ## #   ⁶​population_white, ⁷​pct_white
 
 ``` r
@@ -801,20 +810,20 @@ df_data_race_ca_leftmost <- df_data_race_ca %>%
   head(1)
 
 df_data_race_ca_rightmost <- df_data_race_ca %>%
-  arrange(deaths_per100k_avg) %>%
+  arrange(deaths_per100k_max) %>%
   head(1)
 
 # compare death counts for majority white vs. majority minority counties in California
 
 # get correlation value
-pct_white_deaths_per_100k_avg <- 
-  cor(x = df_data_race_ca %>% pull(pct_white), y = df_data_race_ca %>% pull(deaths_per100k_avg)) %>%
+pct_white_deaths_per_100k_max <- 
+  cor(x = df_data_race_ca %>% pull(pct_white), y = df_data_race_ca %>% pull(deaths_per100k_max)) %>%
   round(3)
 
 
 # plot
 df_data_race_ca %>%
-  ggplot(mapping = aes(x = pct_white, y = deaths_per100k_avg, label = county)) +
+  ggplot(mapping = aes(x = pct_white, y = deaths_per100k_max, label = county)) +
   geom_point() +
   geom_smooth(method = "loess") +
   geom_label_repel(data = df_data_race_ca_leftmost) + 
@@ -822,7 +831,7 @@ df_data_race_ca %>%
   geom_vline(xintercept = 0.5, color = "red", linetype = "dashed") +
   xlab("% white in 2021") +
   ylab("Average deaths per 100k per county in 2020") +
-  annotate("text", x = 0.8, y = 110, label=paste("R value", pct_white_deaths_per_100k_avg))
+  annotate("text", x = 0.8, y = 250, label=paste("R value", pct_white_deaths_per_100k_max))
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
